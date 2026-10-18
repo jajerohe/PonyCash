@@ -5,7 +5,15 @@ import { admin } from "better-auth/plugins";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 
+// Dirección pública de la app. En Vercel se toma sola del dominio de producción.
+const baseURL =
+  process.env.BETTER_AUTH_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : undefined);
+
 export const auth = betterAuth({
+  baseURL,
   database: drizzleAdapter(db, { provider: "pg", schema }),
   emailAndPassword: {
     enabled: true,

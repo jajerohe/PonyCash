@@ -7,8 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:push": "drizzle-kit push",
-    "crear-admin": "tsx scripts/crear-admin.ts"
+    "db:migrate": "drizzle-kit migrate",
+    "vercel-build": "drizzle-kit migrate && next build",
+    "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
     "better-auth": "^1.7.10",
@@ -29,7 +30,6 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.2",
     "tailwindcss": "^4",
-    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }
