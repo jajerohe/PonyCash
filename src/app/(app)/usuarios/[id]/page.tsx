@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { Formulario } from "@/components/formulario";
 import { Campo, Selector, Tarjeta } from "@/components/ui";
-import { auth } from "@/lib/auth";
+import { getAuth } from "@/lib/auth";
 import { requireAdmin } from "@/lib/session";
 import {
   actualizarDatos,
@@ -17,7 +17,7 @@ export default async function EditarUsuarioPage({ params }: PageProps<"/usuarios
   const { user: yo } = await requireAdmin();
   const { id } = await params;
 
-  const usuario = await auth.api
+  const usuario = await getAuth().api
     .getUser({ query: { id }, headers: await headers() })
     .catch(() => null);
   if (!usuario) notFound();

@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { Insignia, Tarjeta } from "@/components/ui";
-import { auth } from "@/lib/auth";
+import { getAuth } from "@/lib/auth";
 import { requireAdmin } from "@/lib/session";
 
 export default async function UsuariosPage() {
   await requireAdmin();
-  const { users } = await auth.api.listUsers({
+  const { users } = await getAuth().api.listUsers({
     query: { limit: 200, sortBy: "createdAt", sortDirection: "desc" },
     headers: await headers(),
   });

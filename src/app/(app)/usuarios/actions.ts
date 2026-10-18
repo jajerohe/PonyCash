@@ -5,7 +5,7 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { getAuth } from "@/lib/auth";
 import { mensajeDeError, type Estado } from "@/lib/errores";
 import { requireAdmin } from "@/lib/session";
 
@@ -18,7 +18,7 @@ function texto(datos: FormData, campo: string) {
 export async function crearUsuario(_estado: Estado, datos: FormData): Promise<Estado> {
   await requireAdmin();
   try {
-    await auth.api.createUser({
+    await getAuth().api.createUser({
       body: {
         name: texto(datos, "name"),
         email: texto(datos, "email"),
@@ -37,7 +37,7 @@ export async function crearUsuario(_estado: Estado, datos: FormData): Promise<Es
 export async function actualizarDatos(_estado: Estado, datos: FormData): Promise<Estado> {
   await requireAdmin();
   try {
-    await auth.api.adminUpdateUser({
+    await getAuth().api.adminUpdateUser({
       body: {
         userId: texto(datos, "userId"),
         data: { name: texto(datos, "name"), email: texto(datos, "email").toLowerCase() },
@@ -58,7 +58,7 @@ export async function cambiarRol(_estado: Estado, datos: FormData): Promise<Esta
     return { ok: false, mensaje: "No puedes cambiar tu propio rol." };
   }
   try {
-    await auth.api.setRole({
+    await getAuth().api.setRole({
       body: { userId, role: texto(datos, "role") as Rol },
       headers: await headers(),
     });
@@ -76,7 +76,7 @@ export async function cambiarContrasena(_estado: Estado, datos: FormData): Promi
     return { ok: false, mensaje: "La contraseña debe tener al menos 8 caracteres." };
   }
   try {
-    await auth.api.setUserPassword({
+    await getAuth().api.setUserPassword({
       body: { userId: texto(datos, "userId"), newPassword: nueva },
       headers: await headers(),
     });
@@ -96,9 +96,9 @@ export async function cambiarBloqueo(_estado: Estado, datos: FormData): Promise<
   try {
     if (bloquear) {
       // Bloquear también cierra todas sus sesiones abiertas.
-      await auth.api.banUser({ body: { userId }, headers: await headers() });
+      await getAuth().api.banUser({ body: { userId }, headers: await headers() });
     } else {
-      await auth.api.unbanUser({ body: { userId }, headers: await headers() });
+      await getAuth().api.unbanUser({ body: { userId }, headers: await headers() });
     }
   } catch (error) {
     return { ok: false, mensaje: mensajeDeError(error) };
@@ -114,7 +114,7 @@ export async function eliminarUsuario(_estado: Estado, datos: FormData): Promise
     return { ok: false, mensaje: "No puedes eliminarte a ti mismo." };
   }
   try {
-    await auth.api.removeUser({ body: { userId }, headers: await headers() });
+    await getAuth().api.removeUser({ body: { userId }, headers: await headers() });
   } catch (error) {
     return { ok: false, mensaje: mensajeDeError(error) };
   }

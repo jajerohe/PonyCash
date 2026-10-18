@@ -1,12 +1,15 @@
 import { redirect } from "next/navigation";
 import { Formulario } from "@/components/formulario";
 import { Campo } from "@/components/ui";
+import { hayUsuarios } from "@/lib/configuracion";
 import { getSession } from "@/lib/session";
 import { iniciarSesion } from "./actions";
 
 export default async function LoginPage() {
   // Si ya inició sesión, no tiene sentido mostrar el login.
   if (await getSession()) redirect("/");
+  // Si la app es nueva y no hay usuarios, primero hay que crear el administrador.
+  if (!(await hayUsuarios())) redirect("/configurar");
 
   return (
     <main className="flex flex-1 items-center justify-center bg-gradient-to-br from-violet-50 via-white to-emerald-50 p-4">
