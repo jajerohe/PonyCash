@@ -1,10 +1,10 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "./auth";
+import { getAuth } from "./auth";
 
 // Devuelve la sesión actual, o null si nadie ha iniciado sesión.
 export async function getSession() {
-  return auth.api.getSession({ headers: await headers() });
+  return getAuth().api.getSession({ headers: await headers() });
 }
 
 // Para páginas y acciones que requieren haber iniciado sesión.

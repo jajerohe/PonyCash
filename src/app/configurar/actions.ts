@@ -2,7 +2,7 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { getAuth } from "@/lib/auth";
 import { hayUsuarios } from "@/lib/configuracion";
 import { mensajeDeError, type Estado } from "@/lib/errores";
 
@@ -19,8 +19,8 @@ export async function crearPrimerAdmin(_estado: Estado, datos: FormData): Promis
   }
 
   try {
-    await auth.api.createUser({ body: { name, email, password, role: "admin" } });
-    await auth.api.signInEmail({ body: { email, password }, headers: await headers() });
+    await getAuth().api.createUser({ body: { name, email, password, role: "admin" } });
+    await getAuth().api.signInEmail({ body: { email, password }, headers: await headers() });
   } catch (error) {
     return { ok: false, mensaje: mensajeDeError(error) };
   }

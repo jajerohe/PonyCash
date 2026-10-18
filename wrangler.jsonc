@@ -1,0 +1,24 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "name": "ponycash",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": [
+    // Permite usar las librerías de Node.js (como el driver de PostgreSQL)
+    "nodejs_compat",
+    "global_fetch_strictly_public",
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "ponycash",
+    },
+  ],
+  "observability": {
+    "enabled": true,
+  },
+}
