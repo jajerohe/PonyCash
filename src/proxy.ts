@@ -11,6 +11,6 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Todo excepto el login, la configuración inicial, la API de autenticación y los archivos estáticos.
-  matcher: ["/((?!login|configurar|api/auth|_next/static|_next/image|favicon.ico).*)"],
+  // Todo excepto el login, la configuración inicial, el diagnóstico, la API de autenticación y los archivos estáticos.
+  matcher: ["/((?!login|configurar|api/auth|api/estado|_next/static|_next/image|favicon.ico).*)"],
 };
