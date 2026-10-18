@@ -4,6 +4,7 @@ Aplicación web hecha con **Next.js + TypeScript + Neon (PostgreSQL)**.
 
 Por ahora tiene:
 - **Inicio de sesión** con correo y contraseña.
+- **Manillas** del parque: categorías (solo administradores) y registro de cuántas se vendieron, con resumen por fechas.
 - **Administración de usuarios** (solo para administradores): crear, editar nombre y correo, cambiar rol, cambiar contraseña, bloquear/desbloquear y eliminar.
 
 ## Herramientas
@@ -68,6 +69,7 @@ src/
 ├── lib/
 │   ├── auth.ts                 Configuración de Better Auth
 │   ├── session.ts              requireSession() y requireAdmin()
+│   ├── fechas.ts               "Hoy" en hora de Bogotá y formato de fechas
 │   └── errores.ts              Mensajes de error en español
 ├── components/
 │   ├── ui.tsx                  Botón, campo, tarjeta, insignia
@@ -80,6 +82,9 @@ src/
     └── (app)/                  Páginas que requieren sesión
         ├── layout.tsx          Menú lateral + contenido
         ├── page.tsx            Inicio
+        ├── manillas/           Ventas de manillas y resumen
+        │   ├── categorias/     Tipos de manilla (administradores)
+        │   └── actions.ts      Registrar venta, crear/editar/eliminar categorías
         └── usuarios/           Administración de usuarios
             ├── page.tsx        Lista
             ├── nuevo/          Crear usuario
