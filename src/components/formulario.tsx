@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useActionState, type ReactNode } from "react";
+import { startTransition, useActionState, useEffect, useRef, type ReactNode } from "react";
 import type { Estado } from "@/lib/errores";
 import { Boton } from "./ui";
 
@@ -14,6 +14,7 @@ export function Formulario({
   variante = "primario",
   confirmar,
   anchoCompleto = false,
+  limpiarAlGuardar = false,
   className = "space-y-4",
 }: {
   accion: (estado: Estado, datos: FormData) => Promise<Estado>;
@@ -22,12 +23,20 @@ export function Formulario({
   variante?: "primario" | "secundario" | "peligro";
   confirmar?: string;
   anchoCompleto?: boolean;
+  limpiarAlGuardar?: boolean;
   className?: string;
 }) {
   const [estado, enviar, pendiente] = useActionState(accion, null);
+  const formulario = useRef<HTMLFormElement>(null);
+
+  // Después de guardar con éxito, deja el formulario listo para el siguiente registro.
+  useEffect(() => {
+    if (limpiarAlGuardar && estado?.ok) formulario.current?.reset();
+  }, [estado, limpiarAlGuardar]);
 
   return (
     <form
+      ref={formulario}
       className={className}
       onSubmit={(e) => {
         e.preventDefault();

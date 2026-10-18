@@ -1,6 +1,17 @@
-// Tablas que necesita Better Auth (inicio de sesión) más los campos
+// Tablas de la app. Primero las que necesita Better Auth (inicio de sesión) más los campos
 // del plugin "admin" (role, banned, banReason, banExpires, impersonatedBy).
-import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import {
+  boolean,
+  check,
+  date,
+  index,
+  integer,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -77,4 +88,35 @@ export const verification = pgTable(
       .notNull(),
   },
   (table) => [index("verification_identifier_idx").on(table.identifier)],
+);
+
+// ---------- Manillas ----------
+
+// Tipos de manilla (por ejemplo: Pasaporte Total, Básica, Niño).
+export const categoriaManilla = pgTable("categoria_manilla", {
+  id: serial("id").primaryKey(),
+  nombre: text("nombre").notNull().unique(),
+  color: text("color").notNull().default("#7c3aed"),
+  descripcion: text("descripcion"),
+  activa: boolean("activa").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Cada registro dice cuántas manillas de una categoría se vendieron en una fecha.
+export const ventaManilla = pgTable(
+  "venta_manilla",
+  {
+    id: serial("id").primaryKey(),
+    categoriaId: integer("categoria_id")
+      .notNull()
+      .references(() => categoriaManilla.id, { onDelete: "restrict" }),
+    cantidad: integer("cantidad").notNull(),
+    fecha: date("fecha").notNull(),
+    usuarioId: text("usuario_id").references(() => user.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("venta_manilla_fecha_idx").on(table.fecha),
+    check("venta_manilla_cantidad_positiva", sql`${table.cantidad} > 0`),
+  ],
 );

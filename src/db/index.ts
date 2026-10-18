@@ -10,7 +10,7 @@ export const getDb = cache(() => {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL, maxUses: 1 });
   // Cloudflare cierra la conexión al terminar la visita; no es un error real.
   pool.on("error", (error) => {
-    if (!error.message.includes("socket has been closed")) console.error(error);
+    if (!/closed|closing/.test(error.message)) console.error(error);
   });
   return drizzle({ client: pool, schema });
 });
