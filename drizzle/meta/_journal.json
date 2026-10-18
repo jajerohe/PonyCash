@@ -15,6 +15,27 @@
       "when": 1792295318568,
       "tag": "0001_manillas",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792297853919,
+      "tag": "0002_quitar_manillas",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792297901801,
+      "tag": "0003_tarifas",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792297902809,
+      "tag": "0004_tarifas_iniciales",
+      "breakpoints": true
     }
   ]
 }
