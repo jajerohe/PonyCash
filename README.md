@@ -4,7 +4,7 @@ Aplicación web hecha con **Next.js + TypeScript + Neon (PostgreSQL)**.
 
 Por ahora tiene:
 - **Inicio de sesión** con correo y contraseña.
-- **Manillas** del parque: categorías (solo administradores) y registro de cuántas se vendieron, con resumen por fechas.
+- **Tarifas** del parque: categorías, manillas, tipos de tarifa y el valor de cada manilla por tipo de tarifa. Todos los usuarios las ven; solo los administradores las cambian.
 - **Administración de usuarios** (solo para administradores): crear, editar nombre y correo, cambiar rol, cambiar contraseña, bloquear/desbloquear y eliminar.
 
 ## Herramientas
@@ -34,12 +34,12 @@ que falten en Neon y publica la app de nuevo.
    - **Project name**: `ponycash` (debe coincidir con `wrangler.jsonc`).
    - **Build command**: `npm run cf:build`
    - **Deploy command**: `npx opennextjs-cloudflare deploy`
-   - En **Advanced settings → Build variables** agrega `DATABASE_URL` con la
-     cadena de Neon (se usa para crear las tablas).
-5. Presiona **Deploy**. Cuando termine, ve a **Settings → Variables and Secrets**
-   del Worker y agrega, como tipo **Secret**:
+5. En **Settings → Build → Variables and secrets** agrega, como tipo **Secret**:
    - `DATABASE_URL`: la cadena de Neon.
    - `BETTER_AUTH_SECRET`: la clave del paso 2.
+
+   Al publicar, la app crea las tablas y copia estos dos valores a sus propios
+   secretos (`scripts/subir-secretos.mjs`). Compruébalo en `/api/estado`.
 6. Abre la dirección `https://ponycash.<tu-cuenta>.workers.dev`. La primera vez
    aparece **Bienvenido a PonyCash** para crear tu usuario administrador.
 
@@ -69,7 +69,7 @@ src/
 ├── lib/
 │   ├── auth.ts                 Configuración de Better Auth
 │   ├── session.ts              requireSession() y requireAdmin()
-│   ├── fechas.ts               "Hoy" en hora de Bogotá y formato de fechas
+│   ├── pesos.ts                Formato y lectura de valores en pesos
 │   └── errores.ts              Mensajes de error en español
 ├── components/
 │   ├── ui.tsx                  Botón, campo, tarjeta, insignia
@@ -82,15 +82,17 @@ src/
     └── (app)/                  Páginas que requieren sesión
         ├── layout.tsx          Menú lateral + contenido
         ├── page.tsx            Inicio
-        ├── manillas/           Ventas de manillas y resumen
-        │   ├── categorias/     Tipos de manilla (administradores)
-        │   └── actions.ts      Registrar venta, crear/editar/eliminar categorías
+        ├── tarifas/            Tabla de tarifas por categoría
+        │   ├── manillas/       Crear y editar una manilla con sus valores
+        │   ├── configuracion/  Categorías y tipos de tarifa
+        │   └── actions.ts      Guardar, crear y eliminar
         └── usuarios/           Administración de usuarios
             ├── page.tsx        Lista
             ├── nuevo/          Crear usuario
             ├── [id]/           Editar usuario
             └── actions.ts      Acciones (crear, editar, bloquear, eliminar…)
-drizzle/                        Migraciones SQL (cambios en las tablas)
+drizzle/                        Migraciones SQL (cambios en las tablas y tarifas iniciales)
+scripts/subir-secretos.mjs      Copia los secretos de Build a la app al publicar
 wrangler.jsonc                  Configuración del Worker de Cloudflare
 open-next.config.ts             Configuración del adaptador OpenNext
 ```

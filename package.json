@@ -9,7 +9,7 @@
     "lint": "eslint",
     "db:migrate": "drizzle-kit migrate",
     "db:generate": "drizzle-kit generate",
-    "cf:build": "drizzle-kit migrate && opennextjs-cloudflare build",
+    "cf:build": "drizzle-kit migrate && node scripts/subir-secretos.mjs && opennextjs-cloudflare build",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
   },

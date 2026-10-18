@@ -1,0 +1,106 @@
+-- Tarifas iniciales del parque (tomadas de la tabla de tarifas).
+-- Solo se cargan si la tabla de categorías está vacía.
+INSERT INTO "categoria" ("nombre", "orden") SELECT * FROM (VALUES
+  ('ENTRADAS', 1),
+  ('PASE ANUAL', 2),
+  ('COMBOS', 3),
+  ('ATRACCIONES', 4),
+  ('RESERVAS', 5)
+) AS v(nombre, orden) WHERE NOT EXISTS (SELECT 1 FROM "categoria");
+--> statement-breakpoint
+INSERT INTO "tipo_tarifa" ("nombre", "orden") SELECT * FROM (VALUES
+  ('PLENA', 1),
+  ('CONVENIO No. 1', 2),
+  ('CONVENIO No. 2', 3),
+  ('DESCUENTO 50%', 4),
+  ('TAQUILLA', 5),
+  ('WEB', 6),
+  ('CORTESIA', 7)
+) AS v(nombre, orden) WHERE NOT EXISTS (SELECT 1 FROM "tipo_tarifa");
+--> statement-breakpoint
+INSERT INTO "manilla" ("categoria_id", "nombre", "orden")
+SELECT c.id, v.nombre, v.orden FROM (VALUES
+  ('ENTRADAS', 'ADULTO', 1),
+  ('ENTRADAS', 'ADULTO MAYOR', 2),
+  ('ENTRADAS', 'NIÑO', 3),
+  ('PASE ANUAL', 'ADULTO', 1),
+  ('PASE ANUAL', 'ADULTO MAYOR', 2),
+  ('PASE ANUAL', 'NIÑO', 3),
+  ('COMBOS', 'COMBO BASICO', 1),
+  ('COMBOS', 'COMBO INFANTIL', 2),
+  ('COMBOS', 'COMBO JUNIOR', 3),
+  ('COMBOS', 'PASAPORTE FULL VAQUERO', 4),
+  ('ATRACCIONES', 'NIÑO CABRIO', 1),
+  ('ATRACCIONES', 'PASEO A CABALLO', 2),
+  ('ATRACCIONES', 'FOTO CON ÑOÑO', 3),
+  ('ATRACCIONES', 'TIRO AL BLANCO', 4),
+  ('ATRACCIONES', 'SALTARIN', 5),
+  ('ATRACCIONES', 'PASEO EN TREN', 6),
+  ('ATRACCIONES', 'PASEO EN TREN ACOMPAÑANTE', 7),
+  ('ATRACCIONES', 'TIROLESA', 8),
+  ('ATRACCIONES', 'CUATRIMOTO', 9),
+  ('ATRACCIONES', 'PAJARERA', 10),
+  ('RESERVAS', 'ADULTO', 1),
+  ('RESERVAS', 'ADULTO MAYOR', 2),
+  ('RESERVAS', 'NIÑO', 3),
+  ('RESERVAS', 'COMBO BASICO', 4),
+  ('RESERVAS', 'COMBO INFANTIL', 5),
+  ('RESERVAS', 'COMBO JUNIOR', 6),
+  ('RESERVAS', 'PASAPORTE FULL VAQUERO', 7)
+) AS v(categoria, nombre, orden)
+JOIN "categoria" c ON c.nombre = v.categoria
+WHERE NOT EXISTS (SELECT 1 FROM "manilla");
+--> statement-breakpoint
+INSERT INTO "tarifa" ("manilla_id", "tipo_tarifa_id", "valor")
+SELECT m.id, t.id, v.valor FROM (VALUES
+  ('ENTRADAS', 'ADULTO', 'PLENA', 25000),
+  ('ENTRADAS', 'ADULTO', 'CONVENIO No. 1', 20000),
+  ('ENTRADAS', 'ADULTO', 'CONVENIO No. 2', 18750),
+  ('ENTRADAS', 'ADULTO', 'DESCUENTO 50%', 12500),
+  ('ENTRADAS', 'ADULTO MAYOR', 'PLENA', 12500),
+  ('ENTRADAS', 'ADULTO MAYOR', 'CONVENIO No. 1', 10000),
+  ('ENTRADAS', 'ADULTO MAYOR', 'CONVENIO No. 2', 9375),
+  ('ENTRADAS', 'ADULTO MAYOR', 'DESCUENTO 50%', 6250),
+  ('ENTRADAS', 'NIÑO', 'PLENA', 12500),
+  ('ENTRADAS', 'NIÑO', 'CONVENIO No. 1', 10000),
+  ('ENTRADAS', 'NIÑO', 'CONVENIO No. 2', 9375),
+  ('ENTRADAS', 'NIÑO', 'DESCUENTO 50%', 6250),
+  ('PASE ANUAL', 'ADULTO', 'PLENA', 99000),
+  ('PASE ANUAL', 'ADULTO', 'TAQUILLA', 79000),
+  ('PASE ANUAL', 'ADULTO', 'WEB', 83000),
+  ('PASE ANUAL', 'ADULTO MAYOR', 'PLENA', 49000),
+  ('PASE ANUAL', 'ADULTO MAYOR', 'TAQUILLA', 39000),
+  ('PASE ANUAL', 'ADULTO MAYOR', 'WEB', 41000),
+  ('PASE ANUAL', 'NIÑO', 'PLENA', 99000),
+  ('PASE ANUAL', 'NIÑO', 'TAQUILLA', 59000),
+  ('PASE ANUAL', 'NIÑO', 'WEB', 67000),
+  ('COMBOS', 'COMBO BASICO', 'PLENA', 75000),
+  ('COMBOS', 'COMBO BASICO', 'CORTESIA', 37500),
+  ('COMBOS', 'COMBO INFANTIL', 'PLENA', 210000),
+  ('COMBOS', 'COMBO INFANTIL', 'CORTESIA', 172500),
+  ('COMBOS', 'COMBO JUNIOR', 'PLENA', 127500),
+  ('COMBOS', 'COMBO JUNIOR', 'CORTESIA', 90000),
+  ('COMBOS', 'PASAPORTE FULL VAQUERO', 'PLENA', 157500),
+  ('COMBOS', 'PASAPORTE FULL VAQUERO', 'CORTESIA', 138750),
+  ('ATRACCIONES', 'NIÑO CABRIO', 'PLENA', 20000),
+  ('ATRACCIONES', 'PASEO A CABALLO', 'PLENA', 30000),
+  ('ATRACCIONES', 'FOTO CON ÑOÑO', 'PLENA', 20000),
+  ('ATRACCIONES', 'TIRO AL BLANCO', 'PLENA', 20000),
+  ('ATRACCIONES', 'SALTARIN', 'PLENA', 25000),
+  ('ATRACCIONES', 'PASEO EN TREN', 'PLENA', 25000),
+  ('ATRACCIONES', 'PASEO EN TREN ACOMPAÑANTE', 'PLENA', 10000),
+  ('ATRACCIONES', 'TIROLESA', 'PLENA', 30000),
+  ('ATRACCIONES', 'CUATRIMOTO', 'PLENA', 30000),
+  ('ATRACCIONES', 'PAJARERA', 'PLENA', 5000),
+  ('RESERVAS', 'ADULTO', 'PLENA', 20000),
+  ('RESERVAS', 'ADULTO MAYOR', 'PLENA', 10000),
+  ('RESERVAS', 'NIÑO', 'PLENA', 40000),
+  ('RESERVAS', 'COMBO BASICO', 'PLENA', 75000),
+  ('RESERVAS', 'COMBO INFANTIL', 'PLENA', 210000),
+  ('RESERVAS', 'COMBO JUNIOR', 'PLENA', 127500),
+  ('RESERVAS', 'PASAPORTE FULL VAQUERO', 'PLENA', 157500)
+) AS v(categoria, manilla, tipo, valor)
+JOIN "categoria" c ON c.nombre = v.categoria
+JOIN "manilla" m ON m.categoria_id = c.id AND m.nombre = v.manilla
+JOIN "tipo_tarifa" t ON t.nombre = v.tipo
+WHERE NOT EXISTS (SELECT 1 FROM "tarifa");
