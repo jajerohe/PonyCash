@@ -1,4 +1,4 @@
-import { Menu } from "@/components/menu";
+import { Menu, type SeccionMenu } from "@/components/menu";
 import { getAcceso } from "@/lib/accesos";
 import { cerrarSesion } from "../login/actions";
 
@@ -6,11 +6,19 @@ import { cerrarSesion } from "../login/actions";
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const { session, perfil, puede } = await getAcceso();
   const { user } = session;
-  const opciones = [
-    { href: "/", texto: "Inicio" },
-    ...(puede("categorias.ver") ? [{ href: "/categorias", texto: "Categorías" }] : []),
-    ...(puede("usuarios.ver") ? [{ href: "/usuarios", texto: "Usuarios" }] : []),
-    ...(puede("perfiles.ver") ? [{ href: "/perfiles", texto: "Perfiles" }] : []),
+  const secciones: SeccionMenu[] = [
+    { opciones: [{ href: "/", texto: "Inicio" }] },
+    {
+      titulo: "Operaciones",
+      opciones: [...(puede("categorias.ver") ? [{ href: "/categorias", texto: "Categorías" }] : [])],
+    },
+    {
+      titulo: "Administración",
+      opciones: [
+        ...(puede("usuarios.ver") ? [{ href: "/usuarios", texto: "Usuarios" }] : []),
+        ...(puede("perfiles.ver") ? [{ href: "/perfiles", texto: "Perfiles" }] : []),
+      ],
+    },
   ];
 
   return (
@@ -23,7 +31,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           <span className="text-lg font-bold">PonyCash</span>
         </div>
 
-        <Menu opciones={opciones} />
+        <Menu secciones={secciones} />
 
         <div className="mt-auto border-t border-slate-200 pt-4">
           <p className="truncate px-2 text-sm font-medium">{user.name}</p>
