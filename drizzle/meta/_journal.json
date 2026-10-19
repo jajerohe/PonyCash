@@ -36,6 +36,20 @@
       "when": 1792297902809,
       "tag": "0004_tarifas_iniciales",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792439095866,
+      "tag": "0005_quitar_tarifas",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792439096673,
+      "tag": "0006_volver_manillas",
+      "breakpoints": true
     }
   ]
 }

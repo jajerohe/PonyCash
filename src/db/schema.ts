@@ -4,13 +4,13 @@ import { sql } from "drizzle-orm";
 import {
   boolean,
   check,
+  date,
   index,
   integer,
   pgTable,
   serial,
   text,
   timestamp,
-  unique,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -90,55 +90,33 @@ export const verification = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
+// ---------- Manillas ----------
 
-// ---------- Tarifas ----------
-
-// Grupos de manillas: Entradas, Pase anual, Combos, Atracciones, Reservas…
-export const categoria = pgTable("categoria", {
+// Tipos de manilla (por ejemplo: Pasaporte Total, Básica, Niño).
+export const categoriaManilla = pgTable("categoria_manilla", {
   id: serial("id").primaryKey(),
   nombre: text("nombre").notNull().unique(),
-  orden: integer("orden").notNull().default(0),
+  color: text("color").notNull().default("#7c3aed"),
+  descripcion: text("descripcion"),
   activa: boolean("activa").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// Clases de precio: Plena, Convenio No. 1, Taquilla, Web, Cortesía…
-export const tipoTarifa = pgTable("tipo_tarifa", {
-  id: serial("id").primaryKey(),
-  nombre: text("nombre").notNull().unique(),
-  orden: integer("orden").notNull().default(0),
-  activa: boolean("activa").notNull().default(true),
-});
-
-// Lo que se vende dentro de una categoría: Adulto, Niño, Combo básico…
-export const manilla = pgTable(
-  "manilla",
+// Cada registro dice cuántas manillas de una categoría se vendieron en una fecha.
+export const ventaManilla = pgTable(
+  "venta_manilla",
   {
     id: serial("id").primaryKey(),
     categoriaId: integer("categoria_id")
       .notNull()
-      .references(() => categoria.id, { onDelete: "restrict" }),
-    nombre: text("nombre").notNull(),
-    orden: integer("orden").notNull().default(0),
-    activa: boolean("activa").notNull().default(true),
-  },
-  (table) => [unique("manilla_categoria_nombre_unique").on(table.categoriaId, table.nombre)],
-);
-
-// Valor (en pesos) de una manilla para un tipo de tarifa.
-export const tarifa = pgTable(
-  "tarifa",
-  {
-    id: serial("id").primaryKey(),
-    manillaId: integer("manilla_id")
-      .notNull()
-      .references(() => manilla.id, { onDelete: "cascade" }),
-    tipoTarifaId: integer("tipo_tarifa_id")
-      .notNull()
-      .references(() => tipoTarifa.id, { onDelete: "restrict" }),
-    valor: integer("valor").notNull(),
+      .references(() => categoriaManilla.id, { onDelete: "restrict" }),
+    cantidad: integer("cantidad").notNull(),
+    fecha: date("fecha").notNull(),
+    usuarioId: text("usuario_id").references(() => user.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    unique("tarifa_manilla_tipo_unique").on(table.manillaId, table.tipoTarifaId),
-    check("tarifa_valor_no_negativo", sql`${table.valor} >= 0`),
+    index("venta_manilla_fecha_idx").on(table.fecha),
+    check("venta_manilla_cantidad_positiva", sql`${table.cantidad} > 0`),
   ],
 );

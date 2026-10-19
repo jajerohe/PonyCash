@@ -8,7 +8,7 @@ export function Menu({ esAdmin }: { esAdmin: boolean }) {
   const ruta = usePathname();
   const opciones = [
     { href: "/", texto: "Inicio" },
-    { href: "/tarifas", texto: "Tarifas" },
+    { href: "/manillas", texto: "Manillas" },
     ...(esAdmin ? [{ href: "/usuarios", texto: "Usuarios" }] : []),
   ];
 
