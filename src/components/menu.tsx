@@ -13,20 +13,24 @@ function estaActiva(ruta: string, href: string) {
 }
 
 // Menú lateral. Recibe solo las opciones que el perfil puede ver y resalta
-// la de la página actual. Los grupos se abren y cierran con un clic; el grupo
-// de la página actual empieza abierto. Los grupos vacíos no se muestran.
+// la de la página actual. Los grupos funcionan como acordeón: solo uno abierto
+// a la vez, y empieza abierto el de la página actual. Los grupos vacíos no se muestran.
 export function Menu({ secciones }: { secciones: SeccionMenu[] }) {
   const ruta = usePathname();
-  // Grupos que la persona abrió o cerró a mano (los demás siguen la regla de arriba).
-  const [abiertos, setAbiertos] = useState<Record<string, boolean>>({});
+  const grupoActual = secciones.find(
+    (s) => s.titulo && s.opciones.some((op) => estaActiva(ruta, op.href)),
+  )?.titulo;
+  // Grupo que la persona abrió con un clic (null = todos cerrados).
+  // Mientras no haga clic, queda abierto el grupo de la página actual.
+  const [elegido, setElegido] = useState<string | null | undefined>(undefined);
+  const grupoAbierto = elegido === undefined ? grupoActual : elegido;
 
   return (
     <nav className="flex flex-col gap-1">
       {secciones
         .filter((s) => s.opciones.length > 0)
         .map((s, i) => {
-          const contieneActiva = s.opciones.some((op) => estaActiva(ruta, op.href));
-          const abierto = !s.titulo || (abiertos[s.titulo] ?? contieneActiva);
+          const abierto = !s.titulo || s.titulo === grupoAbierto;
 
           return (
             <div key={s.titulo ?? i} className="flex flex-col gap-1">
@@ -34,7 +38,7 @@ export function Menu({ secciones }: { secciones: SeccionMenu[] }) {
                 <button
                   type="button"
                   aria-expanded={abierto}
-                  onClick={() => setAbiertos({ ...abiertos, [s.titulo!]: !abierto })}
+                  onClick={() => setElegido(abierto ? null : s.titulo)}
                   className="flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-bold text-violet-700 hover:bg-violet-50"
                 >
                   {s.titulo}
