@@ -1,10 +1,16 @@
 import { Menu } from "@/components/menu";
-import { requireSession } from "@/lib/session";
+import { getAcceso } from "@/lib/accesos";
 import { cerrarSesion } from "../login/actions";
 
 // Marco de todas las páginas internas: menú lateral + contenido.
 export default async function AppLayout({ children }: LayoutProps<"/">) {
-  const { user } = await requireSession();
+  const { session, perfil, puede } = await getAcceso();
+  const { user } = session;
+  const opciones = [
+    { href: "/", texto: "Inicio" },
+    ...(puede("usuarios.ver") ? [{ href: "/usuarios", texto: "Usuarios" }] : []),
+    ...(puede("perfiles.ver") ? [{ href: "/perfiles", texto: "Perfiles" }] : []),
+  ];
 
   return (
     <div className="flex flex-1 flex-col md:flex-row">
@@ -16,11 +22,12 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           <span className="text-lg font-bold">PonyCash</span>
         </div>
 
-        <Menu esAdmin={user.role === "admin"} />
+        <Menu opciones={opciones} />
 
         <div className="mt-auto border-t border-slate-200 pt-4">
           <p className="truncate px-2 text-sm font-medium">{user.name}</p>
           <p className="truncate px-2 text-xs text-slate-500">{user.email}</p>
+          <p className="truncate px-2 text-xs text-violet-600">{perfil?.nombre ?? "Sin perfil"}</p>
           <form action={cerrarSesion}>
             <button className="mt-2 w-full rounded-lg px-2 py-2 text-left text-sm text-slate-600 hover:bg-slate-100">
               Cerrar sesión

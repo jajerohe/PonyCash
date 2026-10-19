@@ -57,6 +57,20 @@
       "when": 1792439464545,
       "tag": "0007_quitar_manillas_otra_vez",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792443821907,
+      "tag": "0008_perfiles",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792443822733,
+      "tag": "0009_perfiles_iniciales",
+      "breakpoints": true
     }
   ]
 }

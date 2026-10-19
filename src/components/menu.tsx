@@ -3,13 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-// Menú lateral. Resalta la opción de la página actual.
-export function Menu({ esAdmin }: { esAdmin: boolean }) {
+// Menú lateral. Recibe solo las opciones que el perfil puede ver
+// y resalta la de la página actual.
+export function Menu({ opciones }: { opciones: { href: string; texto: string }[] }) {
   const ruta = usePathname();
-  const opciones = [
-    { href: "/", texto: "Inicio" },
-    ...(esAdmin ? [{ href: "/usuarios", texto: "Usuarios" }] : []),
-  ];
 
   return (
     <nav className="flex gap-1 md:flex-col">

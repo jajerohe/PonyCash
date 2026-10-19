@@ -4,7 +4,8 @@ Aplicación web hecha con **Next.js + TypeScript + Neon (PostgreSQL)**.
 
 Por ahora tiene:
 - **Inicio de sesión** con correo y contraseña.
-- **Administración de usuarios** (solo para administradores): crear, editar nombre y correo, cambiar rol, cambiar contraseña, bloquear/desbloquear y eliminar.
+- **Administración de usuarios**: crear, editar nombre y correo, cambiar perfil, cambiar contraseña, bloquear/desbloquear y eliminar.
+- **Perfiles y accesos**: cada usuario tiene un perfil, y cada perfil indica qué opciones de cada módulo puede usar. El perfil *Administrador* puede todo.
 
 ## Herramientas
 
@@ -67,7 +68,9 @@ src/
 │   └── schema.ts               Tablas (user, session, account, verification)
 ├── lib/
 │   ├── auth.ts                 Configuración de Better Auth
-│   ├── session.ts              requireSession() y requireAdmin()
+│   ├── session.ts              getSession() y requireSession()
+│   ├── permisos.ts             Catálogo de módulos y sus opciones (permisos)
+│   ├── accesos.ts              getAcceso() y requirePermiso("modulo.opcion")
 │   └── errores.ts              Mensajes de error en español
 ├── components/
 │   ├── ui.tsx                  Botón, campo, tarjeta, insignia
@@ -85,16 +88,26 @@ src/
             ├── nuevo/          Crear usuario
             ├── [id]/           Editar usuario
             └── actions.ts      Acciones (crear, editar, bloquear, eliminar…)
+        └── perfiles/           Perfiles y sus permisos por módulo
 drizzle/                        Migraciones SQL (cambios en las tablas)
 wrangler.jsonc                  Configuración del Worker de Cloudflare
 open-next.config.ts             Configuración del adaptador OpenNext
 ```
 
+## Agregar un módulo nuevo
+
+1. Agrega el módulo y sus opciones en `src/lib/permisos.ts`.
+2. En sus páginas y acciones usa `requirePermiso("modulo.opcion")`.
+3. Agrégalo al menú en `src/app/(app)/layout.tsx` con `puede("modulo.ver")`.
+4. Desde **Perfiles**, marca qué perfiles pueden usar cada opción.
+
 ## Seguridad
 
-- Nadie puede registrarse solo: los usuarios los crea un administrador.
-- Cada página y cada acción vuelve a comprobar la sesión y el rol en el servidor.
-- Un administrador no puede bloquearse, eliminarse ni quitarse el rol a sí mismo.
+- Nadie puede registrarse solo: los usuarios los crea alguien con permiso.
+- Cada página y cada acción vuelve a comprobar la sesión y el permiso en el servidor.
+- Solo un administrador puede modificar a otro administrador o dar el perfil de administrador.
+- Nadie puede bloquearse, eliminarse ni cambiarse el perfil a sí mismo.
+- Quien pueda gestionar perfiles puede darse más permisos: entrega esa opción con cuidado.
 - Bloquear a un usuario cierra todas sus sesiones abiertas.
 
 ## Comandos
