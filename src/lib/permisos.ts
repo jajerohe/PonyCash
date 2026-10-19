@@ -18,6 +18,17 @@ export const MODULOS = [
     ],
   },
   {
+    clave: "categorias",
+    nombre: "Categorías",
+    descripcion: "Categorías del parque: Manillas, Reservas, Cortesías…",
+    opciones: [
+      { clave: "ver", nombre: "Ver las categorías" },
+      { clave: "crear", nombre: "Crear categorías" },
+      { clave: "editar", nombre: "Editar, ordenar y activar o desactivar" },
+      { clave: "eliminar", nombre: "Eliminar categorías" },
+    ],
+  },
+  {
     clave: "perfiles",
     nombre: "Perfiles y accesos",
     descripcion: "Qué puede hacer cada perfil en cada módulo",

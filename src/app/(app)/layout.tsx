@@ -8,6 +8,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   const { user } = session;
   const opciones = [
     { href: "/", texto: "Inicio" },
+    ...(puede("categorias.ver") ? [{ href: "/categorias", texto: "Categorías" }] : []),
     ...(puede("usuarios.ver") ? [{ href: "/usuarios", texto: "Usuarios" }] : []),
     ...(puede("perfiles.ver") ? [{ href: "/perfiles", texto: "Perfiles" }] : []),
   ];

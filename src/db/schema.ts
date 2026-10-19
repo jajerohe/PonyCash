@@ -113,3 +113,14 @@ export const perfilPermiso = pgTable(
   },
   (table) => [primaryKey({ columns: [table.perfilId, table.permiso] })],
 );
+
+// ---------- Categorías ----------
+
+// Categorías del parque: Manillas, Reservas, Cortesías, Pase anual, Otros…
+export const categoria = pgTable("categoria", {
+  id: serial("id").primaryKey(),
+  nombre: text("nombre").notNull().unique(),
+  orden: integer("orden").notNull().default(0),
+  activa: boolean("activa").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

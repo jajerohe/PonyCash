@@ -71,6 +71,20 @@
       "when": 1792443822733,
       "tag": "0009_perfiles_iniciales",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792444501973,
+      "tag": "0010_categorias",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1792444502780,
+      "tag": "0011_categorias_iniciales",
+      "breakpoints": true
     }
   ]
 }

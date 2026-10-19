@@ -5,6 +5,7 @@ Aplicación web hecha con **Next.js + TypeScript + Neon (PostgreSQL)**.
 Por ahora tiene:
 - **Inicio de sesión** con correo y contraseña.
 - **Administración de usuarios**: crear, editar nombre y correo, cambiar perfil, cambiar contraseña, bloquear/desbloquear y eliminar.
+- **Categorías** del parque (Manillas, Reservas, Cortesías, Pase anual, Otros): crear, renombrar, ordenar, activar/desactivar y eliminar.
 - **Perfiles y accesos**: cada usuario tiene un perfil, y cada perfil indica qué opciones de cada módulo puede usar. El perfil *Administrador* puede todo.
 
 ## Herramientas
@@ -88,6 +89,7 @@ src/
             ├── nuevo/          Crear usuario
             ├── [id]/           Editar usuario
             └── actions.ts      Acciones (crear, editar, bloquear, eliminar…)
+        ├── categorias/         Categorías del parque
         └── perfiles/           Perfiles y sus permisos por módulo
 drizzle/                        Migraciones SQL (cambios en las tablas)
 wrangler.jsonc                  Configuración del Worker de Cloudflare
