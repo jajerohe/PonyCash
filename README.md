@@ -100,7 +100,7 @@ open-next.config.ts             Configuración del adaptador OpenNext
 
 1. Agrega el módulo y sus opciones en `src/lib/permisos.ts`.
 2. En sus páginas y acciones usa `requirePermiso("modulo.opcion")`.
-3. Agrégalo al menú en `src/app/(app)/layout.tsx` con `puede("modulo.ver")`.
+3. Agrégalo al menú en `src/app/(app)/layout.tsx` con `puede("modulo.ver")`, suelto o dentro de un grupo (como *Administración*).
 4. Desde **Perfiles**, marca qué perfiles pueden usar cada opción.
 
 ## Seguridad
