@@ -13,10 +13,3 @@ export async function requireSession() {
   if (!session) redirect("/login");
   return session;
 }
-
-// Para páginas y acciones solo de administradores.
-export async function requireAdmin() {
-  const session = await requireSession();
-  if (session.user.role !== "admin") redirect("/");
-  return session;
-}
