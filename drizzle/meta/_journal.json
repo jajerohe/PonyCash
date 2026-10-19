@@ -50,6 +50,13 @@
       "when": 1792439096673,
       "tag": "0006_volver_manillas",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792439464545,
+      "tag": "0007_quitar_manillas_otra_vez",
+      "breakpoints": true
     }
   ]
 }
