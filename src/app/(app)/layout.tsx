@@ -9,14 +9,8 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   const { user } = session;
   const secciones: SeccionMenu[] = [
     { opciones: [{ href: "/", texto: "Inicio" }] },
-    {
-      titulo: "Operaciones",
-      opciones: [
-        ...(puede("categorias.ver") ? [{ href: "/categorias", texto: "Categorías" }] : []),
-        ...(puede("subcategorias.ver") ? [{ href: "/subcategorias", texto: "Subcategorías" }] : []),
-        ...(puede("inventario.ver") ? [{ href: "/inventario", texto: "Inventario" }] : []),
-      ],
-    },
+    // Operaciones queda listo para los módulos que se agreguen.
+    { titulo: "Operaciones", opciones: [], mostrarVacio: true },
     {
       titulo: "Administración",
       opciones: [

@@ -9,7 +9,6 @@ import {
   serial,
   text,
   timestamp,
-  unique,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -115,47 +114,3 @@ export const perfilPermiso = pgTable(
   (table) => [primaryKey({ columns: [table.perfilId, table.permiso] })],
 );
 
-// ---------- Categorías ----------
-
-// Categorías del parque: Manillas, Reservas, Cortesías, Pase anual, Otros…
-export const categoria = pgTable("categoria", {
-  id: serial("id").primaryKey(),
-  nombre: text("nombre").notNull().unique(),
-  orden: integer("orden").notNull().default(0),
-  activa: boolean("activa").notNull().default(true),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-// ---------- Subcategorías ----------
-
-// Subcategorías del parque: Entradas, Pase anual, Combos, Atracciones…
-export const subcategoria = pgTable("subcategoria", {
-  id: serial("id").primaryKey(),
-  nombre: text("nombre").notNull().unique(),
-  orden: integer("orden").notNull().default(0),
-  activa: boolean("activa").notNull().default(true),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-// ---------- Inventario ----------
-
-// Productos del inventario, cada uno dentro de una categoría, con su cantidad disponible.
-export const producto = pgTable(
-  "producto",
-  {
-    id: serial("id").primaryKey(),
-    categoriaId: integer("categoria_id")
-      .notNull()
-      .references(() => categoria.id, { onDelete: "restrict" }),
-    nombre: text("nombre").notNull(),
-    cantidad: integer("cantidad").notNull().default(0),
-    orden: integer("orden").notNull().default(0),
-    activo: boolean("activo").notNull().default(true),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
-      .defaultNow()
-      .$onUpdate(() => new Date())
-      .notNull(),
-  },
-  (table) => [unique("producto_categoria_nombre_unique").on(table.categoriaId, table.nombre)],
-);
