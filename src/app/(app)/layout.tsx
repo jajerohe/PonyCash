@@ -10,7 +10,10 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
     { opciones: [{ href: "/", texto: "Inicio" }] },
     {
       titulo: "Operaciones",
-      opciones: [...(puede("categorias.ver") ? [{ href: "/categorias", texto: "Categorías" }] : [])],
+      opciones: [
+        ...(puede("categorias.ver") ? [{ href: "/categorias", texto: "Categorías" }] : []),
+        ...(puede("subcategorias.ver") ? [{ href: "/subcategorias", texto: "Subcategorías" }] : []),
+      ],
     },
     {
       titulo: "Administración",

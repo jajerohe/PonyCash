@@ -29,6 +29,17 @@ export const MODULOS = [
     ],
   },
   {
+    clave: "subcategorias",
+    nombre: "Subcategorías",
+    descripcion: "Subcategorías del parque: Entradas, Combos, Atracciones…",
+    opciones: [
+      { clave: "ver", nombre: "Ver las subcategorías" },
+      { clave: "crear", nombre: "Crear subcategorías" },
+      { clave: "editar", nombre: "Editar, ordenar y activar o desactivar" },
+      { clave: "eliminar", nombre: "Eliminar subcategorías" },
+    ],
+  },
+  {
     clave: "perfiles",
     nombre: "Perfiles y accesos",
     descripcion: "Qué puede hacer cada perfil en cada módulo",
