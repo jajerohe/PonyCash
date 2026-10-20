@@ -85,6 +85,20 @@
       "when": 1792444502780,
       "tag": "0011_categorias_iniciales",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792455011443,
+      "tag": "0012_subcategorias",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792455012724,
+      "tag": "0013_subcategorias_iniciales",
+      "breakpoints": true
     }
   ]
 }

@@ -124,3 +124,14 @@ export const categoria = pgTable("categoria", {
   activa: boolean("activa").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// ---------- Subcategorías ----------
+
+// Subcategorías del parque: Entradas, Pase anual, Combos, Atracciones…
+export const subcategoria = pgTable("subcategoria", {
+  id: serial("id").primaryKey(),
+  nombre: text("nombre").notNull().unique(),
+  orden: integer("orden").notNull().default(0),
+  activa: boolean("activa").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
