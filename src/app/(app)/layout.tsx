@@ -13,6 +13,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
       opciones: [
         ...(puede("categorias.ver") ? [{ href: "/categorias", texto: "Categorías" }] : []),
         ...(puede("subcategorias.ver") ? [{ href: "/subcategorias", texto: "Subcategorías" }] : []),
+        ...(puede("inventario.ver") ? [{ href: "/inventario", texto: "Inventario" }] : []),
       ],
     },
     {

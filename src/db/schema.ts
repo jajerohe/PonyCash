@@ -9,6 +9,7 @@ import {
   serial,
   text,
   timestamp,
+  unique,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -135,3 +136,26 @@ export const subcategoria = pgTable("subcategoria", {
   activa: boolean("activa").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// ---------- Inventario ----------
+
+// Productos del inventario, cada uno dentro de una categoría, con su cantidad disponible.
+export const producto = pgTable(
+  "producto",
+  {
+    id: serial("id").primaryKey(),
+    categoriaId: integer("categoria_id")
+      .notNull()
+      .references(() => categoria.id, { onDelete: "restrict" }),
+    nombre: text("nombre").notNull(),
+    cantidad: integer("cantidad").notNull().default(0),
+    orden: integer("orden").notNull().default(0),
+    activo: boolean("activo").notNull().default(true),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [unique("producto_categoria_nombre_unique").on(table.categoriaId, table.nombre)],
+);

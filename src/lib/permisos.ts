@@ -40,6 +40,17 @@ export const MODULOS = [
     ],
   },
   {
+    clave: "inventario",
+    nombre: "Inventario",
+    descripcion: "Productos de cada categoría y sus cantidades",
+    opciones: [
+      { clave: "ver", nombre: "Ver el inventario" },
+      { clave: "crear", nombre: "Crear productos" },
+      { clave: "editar", nombre: "Editar productos y cantidades" },
+      { clave: "eliminar", nombre: "Eliminar productos" },
+    ],
+  },
+  {
     clave: "perfiles",
     nombre: "Perfiles y accesos",
     descripcion: "Qué puede hacer cada perfil en cada módulo",
