@@ -7,6 +7,7 @@ Por ahora tiene:
 - **Administración de usuarios**: crear, editar nombre y correo, cambiar perfil, cambiar contraseña, bloquear/desbloquear y eliminar.
 - **Categorías** del parque (Manillas, Reservas, Cortesías, Pase anual, Otros): crear, renombrar, ordenar, activar/desactivar y eliminar.
 - **Subcategorías** del parque (Entradas, Pase anual, Combos, Atracciones, Reservas, Zona Parqueo): igual que categorías.
+- **Inventario**: productos de cada categoría con su cantidad; crear, editar, desactivar y eliminar.
 - **Perfiles y accesos**: cada usuario tiene un perfil, y cada perfil indica qué opciones de cada módulo puede usar. El perfil *Administrador* puede todo.
 
 ## Herramientas
@@ -92,6 +93,7 @@ src/
             └── actions.ts      Acciones (crear, editar, bloquear, eliminar…)
         ├── categorias/         Categorías del parque
         ├── subcategorias/      Subcategorías del parque
+        ├── inventario/         Productos por categoría y sus cantidades
         └── perfiles/           Perfiles y sus permisos por módulo
 drizzle/                        Migraciones SQL (cambios en las tablas)
 wrangler.jsonc                  Configuración del Worker de Cloudflare

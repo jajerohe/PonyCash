@@ -4,7 +4,7 @@
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
-import { categoria } from "@/db/schema";
+import { categoria, producto } from "@/db/schema";
 import { requirePermiso } from "@/lib/accesos";
 import type { Estado } from "@/lib/errores";
 
@@ -56,7 +56,19 @@ export async function actualizarCategoria(_estado: Estado, datos: FormData): Pro
 
 export async function eliminarCategoria(_estado: Estado, datos: FormData): Promise<Estado> {
   await requirePermiso("categorias.eliminar");
-  await getDb().delete(categoria).where(eq(categoria.id, entero(datos, "id")));
+  const id = entero(datos, "id");
+  const [conProductos] = await getDb()
+    .select({ id: producto.id })
+    .from(producto)
+    .where(eq(producto.categoriaId, id))
+    .limit(1);
+  if (conProductos) {
+    return {
+      ok: false,
+      mensaje: "Tiene productos en el inventario. Muévelos o elimínalos primero, o desmárcala como activa.",
+    };
+  }
+  await getDb().delete(categoria).where(eq(categoria.id, id));
   revalidatePath("/categorias");
   return { ok: true, mensaje: "Categoría eliminada." };
 }
