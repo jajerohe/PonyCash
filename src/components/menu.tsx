@@ -13,7 +13,7 @@ function estaActiva(ruta: string, href: string) {
   return href === "/" ? ruta === "/" : ruta.startsWith(href);
 }
 
-// Menú lateral. Recibe solo las opciones que el perfil puede ver y resalta
+// Menú lateral. Recibe solo las opciones que la persona puede ver y resalta
 // la de la página actual. Los grupos funcionan como acordeón: solo uno abierto
 // a la vez, y empieza abierto el de la página actual. Los grupos vacíos no se
 // muestran, salvo los marcados con "mostrarVacio".

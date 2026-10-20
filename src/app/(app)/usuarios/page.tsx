@@ -1,13 +1,12 @@
 import Link from "next/link";
-import { desc, eq } from "drizzle-orm";
+import { desc } from "drizzle-orm";
 import { Insignia, Tarjeta } from "@/components/ui";
 import { getDb } from "@/db";
-import { perfil, user } from "@/db/schema";
-import { requirePermiso } from "@/lib/accesos";
+import { user } from "@/db/schema";
+import { nombreDelRol, requireAdmin } from "@/lib/session";
 
 export default async function UsuariosPage() {
-  const { puede } = await requirePermiso("usuarios.ver");
-  const puedeEditar = (["usuarios.editar", "usuarios.perfil", "usuarios.contrasena", "usuarios.bloquear", "usuarios.eliminar"] as const).some(puede);
+  await requireAdmin();
 
   const users = await getDb()
     .select({
@@ -16,11 +15,9 @@ export default async function UsuariosPage() {
       email: user.email,
       banned: user.banned,
       createdAt: user.createdAt,
-      perfil: perfil.nombre,
-      esAdministrador: perfil.esAdministrador,
+      role: user.role,
     })
     .from(user)
-    .leftJoin(perfil, eq(user.perfilId, perfil.id))
     .orderBy(desc(user.createdAt))
     .limit(200);
 
@@ -31,14 +28,12 @@ export default async function UsuariosPage() {
           <h1 className="text-2xl font-bold">Usuarios</h1>
           <p className="text-sm text-slate-500">{users.length} usuario(s) registrados</p>
         </div>
-        {puede("usuarios.crear") && (
-          <Link
-            href="/usuarios/nuevo"
-            className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700"
-          >
-            + Nuevo usuario
-          </Link>
-        )}
+        <Link
+          href="/usuarios/nuevo"
+          className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700"
+        >
+          + Nuevo usuario
+        </Link>
       </div>
 
       <Tarjeta className="overflow-x-auto p-0">
@@ -47,7 +42,7 @@ export default async function UsuariosPage() {
             <tr>
               <th className="px-4 py-3 font-medium">Nombre</th>
               <th className="px-4 py-3 font-medium">Correo</th>
-              <th className="px-4 py-3 font-medium">Perfil</th>
+              <th className="px-4 py-3 font-medium">Rol</th>
               <th className="px-4 py-3 font-medium">Estado</th>
               <th className="px-4 py-3 font-medium">Creado</th>
               <th className="px-4 py-3" />
@@ -59,7 +54,7 @@ export default async function UsuariosPage() {
                 <td className="px-4 py-3 font-medium">{u.name}</td>
                 <td className="px-4 py-3 text-slate-600">{u.email}</td>
                 <td className="px-4 py-3">
-                  <Insignia color={u.esAdministrador ? "violeta" : "gris"}>{u.perfil ?? "Sin perfil"}</Insignia>
+                  <Insignia color={u.role === "admin" ? "violeta" : "gris"}>{nombreDelRol(u.role)}</Insignia>
                 </td>
                 <td className="px-4 py-3">
                   {u.banned ? <Insignia color="rojo">Bloqueado</Insignia> : <Insignia color="verde">Activo</Insignia>}
@@ -68,11 +63,9 @@ export default async function UsuariosPage() {
                   {new Date(u.createdAt).toLocaleDateString("es-CO")}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  {puedeEditar && (
-                    <Link href={`/usuarios/${u.id}`} className="font-medium text-violet-600 hover:underline">
-                      Editar
-                    </Link>
-                  )}
+                  <Link href={`/usuarios/${u.id}`} className="font-medium text-violet-600 hover:underline">
+                    Editar
+                  </Link>
                 </td>
               </tr>
             ))}

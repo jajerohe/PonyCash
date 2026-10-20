@@ -1,15 +1,6 @@
 // Tablas que necesita Better Auth (inicio de sesión) más los campos
 // del plugin "admin" (role, banned, banReason, banExpires, impersonatedBy).
-import {
-  boolean,
-  index,
-  integer,
-  pgTable,
-  primaryKey,
-  serial,
-  text,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -18,8 +9,6 @@ export const user = pgTable("user", {
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
   role: text("role"),
-  // Perfil de accesos (ver la tabla "perfil" más abajo). Sin perfil = sin acceso a módulos.
-  perfilId: integer("perfil_id").references(() => perfil.id, { onDelete: "restrict" }),
   banned: boolean("banned").default(false),
   banReason: text("ban_reason"),
   banExpires: timestamp("ban_expires"),
@@ -88,29 +77,5 @@ export const verification = pgTable(
       .notNull(),
   },
   (table) => [index("verification_identifier_idx").on(table.identifier)],
-);
-
-// ---------- Accesos ----------
-
-// Perfil de accesos: Administrador, Taquilla, Supervisor…
-// El perfil de administrador tiene siempre todos los permisos y no se puede borrar.
-export const perfil = pgTable("perfil", {
-  id: serial("id").primaryKey(),
-  nombre: text("nombre").notNull().unique(),
-  descripcion: text("descripcion"),
-  esAdministrador: boolean("es_administrador").notNull().default(false),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-// Opciones que puede usar un perfil, como "usuarios.crear" (ver src/lib/permisos.ts).
-export const perfilPermiso = pgTable(
-  "perfil_permiso",
-  {
-    perfilId: integer("perfil_id")
-      .notNull()
-      .references(() => perfil.id, { onDelete: "cascade" }),
-    permiso: text("permiso").notNull(),
-  },
-  (table) => [primaryKey({ columns: [table.perfilId, table.permiso] })],
 );
 
