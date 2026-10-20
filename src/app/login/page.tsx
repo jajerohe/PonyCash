@@ -18,7 +18,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
     <MarcoAcceso
       subtitulo="Inicia sesión para continuar"
       pie={
-        <Link href="/recuperar" className="text-violet-600 hover:underline">
+        <Link href="/recuperar" className="text-marca-600 hover:underline">
           ¿Olvidaste tu contraseña?
         </Link>
       }
