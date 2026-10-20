@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Menu, type SeccionMenu } from "@/components/menu";
 import { getAcceso } from "@/lib/accesos";
 import { cerrarSesion } from "../login/actions";
@@ -41,8 +42,14 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           <p className="truncate px-2 text-sm font-medium">{user.name}</p>
           <p className="truncate px-2 text-xs text-slate-500">{user.email}</p>
           <p className="truncate px-2 text-xs text-violet-600">{perfil?.nombre ?? "Sin perfil"}</p>
+          <Link
+            href="/mi-cuenta"
+            className="mt-2 block rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100"
+          >
+            Mi cuenta
+          </Link>
           <form action={cerrarSesion}>
-            <button className="mt-2 w-full rounded-lg px-2 py-2 text-left text-sm text-slate-600 hover:bg-slate-100">
+            <button className="w-full rounded-lg px-2 py-2 text-left text-sm text-slate-600 hover:bg-slate-100">
               Cerrar sesión
             </button>
           </form>
