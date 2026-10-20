@@ -18,39 +18,6 @@ export const MODULOS = [
     ],
   },
   {
-    clave: "categorias",
-    nombre: "Categorías",
-    descripcion: "Categorías del parque: Manillas, Reservas, Cortesías…",
-    opciones: [
-      { clave: "ver", nombre: "Ver las categorías" },
-      { clave: "crear", nombre: "Crear categorías" },
-      { clave: "editar", nombre: "Editar, ordenar y activar o desactivar" },
-      { clave: "eliminar", nombre: "Eliminar categorías" },
-    ],
-  },
-  {
-    clave: "subcategorias",
-    nombre: "Subcategorías",
-    descripcion: "Subcategorías del parque: Entradas, Combos, Atracciones…",
-    opciones: [
-      { clave: "ver", nombre: "Ver las subcategorías" },
-      { clave: "crear", nombre: "Crear subcategorías" },
-      { clave: "editar", nombre: "Editar, ordenar y activar o desactivar" },
-      { clave: "eliminar", nombre: "Eliminar subcategorías" },
-    ],
-  },
-  {
-    clave: "inventario",
-    nombre: "Inventario",
-    descripcion: "Productos de cada categoría y sus cantidades",
-    opciones: [
-      { clave: "ver", nombre: "Ver el inventario" },
-      { clave: "crear", nombre: "Crear productos" },
-      { clave: "editar", nombre: "Editar productos y cantidades" },
-      { clave: "eliminar", nombre: "Eliminar productos" },
-    ],
-  },
-  {
     clave: "perfiles",
     nombre: "Perfiles y accesos",
     descripcion: "Qué puede hacer cada perfil en cada módulo",
