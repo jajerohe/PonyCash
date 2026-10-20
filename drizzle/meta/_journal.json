@@ -120,6 +120,13 @@
       "when": 1792533947592,
       "tag": "0016_quitar_categorias_inventario",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1792535710818,
+      "tag": "0017_quitar_perfiles",
+      "breakpoints": true
     }
   ]
 }

@@ -1,17 +1,11 @@
 import Link from "next/link";
-import { asc } from "drizzle-orm";
 import { Formulario } from "@/components/formulario";
 import { Campo, Selector, Tarjeta } from "@/components/ui";
-import { getDb } from "@/db";
-import { perfil } from "@/db/schema";
-import { requirePermiso } from "@/lib/accesos";
+import { requireAdmin } from "@/lib/session";
 import { crearUsuario } from "../actions";
 
 export default async function NuevoUsuarioPage() {
-  const { esAdministrador } = await requirePermiso("usuarios.crear");
-  const perfiles = (await getDb().select().from(perfil).orderBy(asc(perfil.nombre))).filter(
-    (p) => esAdministrador || !p.esAdministrador,
-  );
+  await requireAdmin();
 
   return (
     <div className="max-w-xl space-y-6">
@@ -27,15 +21,9 @@ export default async function NuevoUsuarioPage() {
           <Campo etiqueta="Nombre" name="name" required />
           <Campo etiqueta="Correo" name="email" type="email" required />
           <Campo etiqueta="Contraseña" name="password" type="password" minLength={8} required />
-          <Selector etiqueta="Perfil" name="perfilId" defaultValue="" required>
-            <option value="" disabled>
-              Elige un perfil
-            </option>
-            {perfiles.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.nombre}
-              </option>
-            ))}
+          <Selector etiqueta="Rol" name="role" defaultValue="user">
+            <option value="user">Usuario</option>
+            <option value="admin">Administrador</option>
           </Selector>
         </Formulario>
       </Tarjeta>

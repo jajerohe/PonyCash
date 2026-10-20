@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { Menu, type SeccionMenu } from "@/components/menu";
-import { getAcceso } from "@/lib/accesos";
+import { nombreDelRol, requireSession } from "@/lib/session";
 import { cerrarSesion } from "../login/actions";
 
 // Marco de todas las páginas internas: menú lateral + contenido.
 export default async function AppLayout({ children }: LayoutProps<"/">) {
-  const { session, perfil, puede } = await getAcceso();
-  const { user } = session;
+  const { user } = await requireSession();
+  const esAdmin = user.role === "admin";
   const secciones: SeccionMenu[] = [
     { opciones: [{ href: "/", texto: "Inicio" }] },
     // Operaciones queda listo para los módulos que se agreguen.
@@ -14,8 +14,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
     {
       titulo: "Administración",
       opciones: [
-        ...(puede("usuarios.ver") ? [{ href: "/usuarios", texto: "Usuarios" }] : []),
-        ...(puede("perfiles.ver") ? [{ href: "/perfiles", texto: "Perfiles" }] : []),
+        ...(esAdmin ? [{ href: "/usuarios", texto: "Usuarios" }] : []),
       ],
     },
   ];
@@ -35,7 +34,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
         <div className="mt-auto border-t border-slate-200 pt-4">
           <p className="truncate px-2 text-sm font-medium">{user.name}</p>
           <p className="truncate px-2 text-xs text-slate-500">{user.email}</p>
-          <p className="truncate px-2 text-xs text-violet-600">{perfil?.nombre ?? "Sin perfil"}</p>
+          <p className="truncate px-2 text-xs text-violet-600">{nombreDelRol(user.role)}</p>
           <Link
             href="/mi-cuenta"
             className="mt-2 block rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100"

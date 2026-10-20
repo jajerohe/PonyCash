@@ -1,19 +1,18 @@
 import { Formulario } from "@/components/formulario";
 import { Campo, Tarjeta } from "@/components/ui";
-import { getAcceso } from "@/lib/accesos";
+import { nombreDelRol, requireSession } from "@/lib/session";
 import { cambiarMiContrasena } from "./actions";
 
 export default async function MiCuentaPage({ searchParams }: PageProps<"/mi-cuenta">) {
-  const { session, perfil } = await getAcceso();
+  const { user } = await requireSession();
   const { cambiada } = await searchParams;
-  const { user } = session;
 
   return (
     <div className="max-w-xl space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Mi cuenta</h1>
         <p className="text-sm text-slate-500">
-          {user.name} · {user.email} · {perfil?.nombre ?? "Sin perfil"}
+          {user.name} · {user.email} · {nombreDelRol(user.role)}
         </p>
       </div>
 
