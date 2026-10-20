@@ -5,6 +5,28 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Colores del logo del Pony Parque. */
+@theme {
+  /* "marca": del naranja del título al café del letrero y la herradura. */
+  --color-marca-50: #fdf6ee;
+  --color-marca-100: #f9e8d4;
+  --color-marca-200: #f1cda6;
+  --color-marca-300: #e5a871;
+  --color-marca-400: #d77f43;
+  --color-marca-500: #c45f27;
+  --color-marca-600: #9a3f18;
+  --color-marca-700: #722410;
+  --color-marca-800: #5a2a17;
+  --color-marca-900: #3e281e;
+  /* Amarillo del título, azul del cielo y crema del fondo. */
+  --color-sol-300: #f6d55c;
+  --color-sol-400: #f5c400;
+  --color-cielo-100: #e3eff0;
+  --color-cielo-300: #96c0c4;
+  --color-crema-50: #fbf9ef;
+  --color-crema-100: #f4f2d3;
+}
+
 body {
-  @apply bg-slate-50 text-slate-900;
+  @apply bg-crema-50 text-slate-900;
 }

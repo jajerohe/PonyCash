@@ -41,7 +41,7 @@ export function Menu({ secciones }: { secciones: SeccionMenu[] }) {
                   type="button"
                   aria-expanded={abierto}
                   onClick={() => setElegido(abierto ? null : s.titulo)}
-                  className="flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-bold text-violet-700 hover:bg-violet-50"
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-bold text-marca-700 hover:bg-marca-50"
                 >
                   {s.titulo}
                   <svg
@@ -69,7 +69,7 @@ export function Menu({ secciones }: { secciones: SeccionMenu[] }) {
                       href={op.href}
                       className={`rounded-lg px-3 py-2 text-sm font-medium ${
                         estaActiva(ruta, op.href)
-                          ? "bg-violet-100 text-violet-700"
+                          ? "bg-marca-100 text-marca-700"
                           : "text-slate-600 hover:bg-slate-100"
                       }`}
                     >

@@ -30,13 +30,13 @@ export default async function EditarUsuarioPage({ params }: PageProps<"/usuarios
   return (
     <div className="max-w-xl space-y-6">
       <div>
-        <Link href="/usuarios" className="text-sm text-violet-600 hover:underline">
+        <Link href="/usuarios" className="text-sm text-marca-600 hover:underline">
           ← Volver a usuarios
         </Link>
         <h1 className="mt-2 text-2xl font-bold">{usuario.name}</h1>
         <p className="flex items-center gap-2 text-sm text-slate-500">
           {usuario.email}
-          <Insignia color={usuario.role === "admin" ? "violeta" : "gris"}>{nombreDelRol(usuario.role)}</Insignia>
+          <Insignia color={usuario.role === "admin" ? "marca" : "gris"}>{nombreDelRol(usuario.role)}</Insignia>
         </p>
       </div>
 

@@ -30,7 +30,7 @@ export default async function UsuariosPage() {
         </div>
         <Link
           href="/usuarios/nuevo"
-          className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700"
+          className="rounded-lg bg-marca-600 px-4 py-2 text-sm font-medium text-white hover:bg-marca-700"
         >
           + Nuevo usuario
         </Link>
@@ -38,7 +38,7 @@ export default async function UsuariosPage() {
 
       <Tarjeta className="overflow-x-auto p-0">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
+          <thead className="border-b border-slate-200 bg-crema-50 text-xs uppercase text-slate-500">
             <tr>
               <th className="px-4 py-3 font-medium">Nombre</th>
               <th className="px-4 py-3 font-medium">Correo</th>
@@ -50,11 +50,11 @@ export default async function UsuariosPage() {
           </thead>
           <tbody className="divide-y divide-slate-100">
             {users.map((u) => (
-              <tr key={u.id} className="hover:bg-slate-50">
+              <tr key={u.id} className="hover:bg-crema-50">
                 <td className="px-4 py-3 font-medium">{u.name}</td>
                 <td className="px-4 py-3 text-slate-600">{u.email}</td>
                 <td className="px-4 py-3">
-                  <Insignia color={u.role === "admin" ? "violeta" : "gris"}>{nombreDelRol(u.role)}</Insignia>
+                  <Insignia color={u.role === "admin" ? "marca" : "gris"}>{nombreDelRol(u.role)}</Insignia>
                 </td>
                 <td className="px-4 py-3">
                   {u.banned ? <Insignia color="rojo">Bloqueado</Insignia> : <Insignia color="verde">Activo</Insignia>}
@@ -63,7 +63,7 @@ export default async function UsuariosPage() {
                   {new Date(u.createdAt).toLocaleDateString("es-CO")}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`/usuarios/${u.id}`} className="font-medium text-violet-600 hover:underline">
+                  <Link href={`/usuarios/${u.id}`} className="font-medium text-marca-600 hover:underline">
                     Editar
                   </Link>
                 </td>

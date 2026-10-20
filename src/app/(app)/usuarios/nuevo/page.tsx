@@ -10,7 +10,7 @@ export default async function NuevoUsuarioPage() {
   return (
     <div className="max-w-xl space-y-6">
       <div>
-        <Link href="/usuarios" className="text-sm text-violet-600 hover:underline">
+        <Link href="/usuarios" className="text-sm text-marca-600 hover:underline">
           ← Volver a usuarios
         </Link>
         <h1 className="mt-2 text-2xl font-bold">Nuevo usuario</h1>

@@ -10,7 +10,7 @@ export default function RecuperarPage() {
     <MarcoAcceso
       subtitulo="Recupera tu contraseña"
       pie={
-        <Link href="/login" className="text-violet-600 hover:underline">
+        <Link href="/login" className="text-marca-600 hover:underline">
           ← Volver a iniciar sesión
         </Link>
       }

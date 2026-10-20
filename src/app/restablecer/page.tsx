@@ -8,7 +8,7 @@ import { restablecerContrasena } from "../recuperar/actions";
 export default async function RestablecerPage({ searchParams }: PageProps<"/restablecer">) {
   const { token } = await searchParams;
   const volver = (
-    <Link href="/recuperar" className="text-violet-600 hover:underline">
+    <Link href="/recuperar" className="text-marca-600 hover:underline">
       Pedir un enlace nuevo
     </Link>
   );
