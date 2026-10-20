@@ -15,6 +15,8 @@ export const getAuth = cache(() =>
       // Nadie puede registrarse solo: los usuarios los crea un administrador.
       disableSignUp: true,
       minPasswordLength: 8,
+      // Al restablecer la contraseña con el enlace del correo se cierran todas las sesiones.
+      revokeSessionsOnPasswordReset: true,
     },
     plugins: [
       // Roles "admin" y "user", y gestión de usuarios

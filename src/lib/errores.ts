@@ -4,6 +4,7 @@ import { isAPIError } from "better-auth/api";
 const MENSAJES: Record<string, string> = {
   INVALID_EMAIL_OR_PASSWORD: "Correo o contraseña incorrectos.",
   INVALID_PASSWORD: "La contraseña actual no es correcta.",
+  INVALID_TOKEN: "El enlace no es válido o ya venció. Pide uno nuevo.",
   INVALID_EMAIL: "El correo no es válido.",
   USER_ALREADY_EXISTS: "Ya existe un usuario con ese correo.",
   USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: "Ya existe un usuario con ese correo.",

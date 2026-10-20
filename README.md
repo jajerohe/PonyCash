@@ -5,6 +5,7 @@ Aplicación web hecha con **Next.js + TypeScript + Neon (PostgreSQL)**.
 Por ahora tiene:
 - **Inicio de sesión** con correo y contraseña.
 - **Mi cuenta**: cada persona cambia su propia contraseña (pide la actual).
+- **¿Olvidaste tu contraseña?**: en el login; envía por correo un enlace (vence en 1 hora) para crear una nueva. Necesita `CORREO_USUARIO` y `CORREO_CONTRASENA` (contraseña de aplicación de Gmail) en los secretos de la app.
 - **Administración de usuarios**: crear, editar nombre y correo, cambiar perfil, cambiar contraseña, bloquear/desbloquear y eliminar.
 - **Categorías** del parque (Manillas, Reservas, Cortesías, Pase anual, Otros): crear, renombrar, ordenar, activar/desactivar y eliminar.
 - **Subcategorías** del parque (Entradas, Pase anual, Combos, Atracciones, Reservas, Zona Parqueo): igual que categorías.
