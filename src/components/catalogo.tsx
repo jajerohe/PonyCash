@@ -8,7 +8,9 @@ import {
   BarraAcciones,
   CabeceraListado,
   VentanaFormulario,
+  claseEncabezadoFijo,
   claseFila,
+  claseTablaDesplazable,
   normalizar,
   useListado,
 } from "@/components/listado";
@@ -92,53 +94,55 @@ export function Catalogo({
 
       <Aviso estado={aviso} />
 
-      <section className="overflow-x-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         {puedeEditar && elementos.length > 0 && (
           <p className="mb-3 text-xs text-slate-500">
             Haz clic en una fila para seleccionarla; doble clic para editarla.
             {seleccionada?.protegido && " Este registro viene con el sistema y no se puede modificar."}
           </p>
         )}
-        <table className="w-full text-left text-sm">
-          <thead className="border-y border-slate-300 bg-crema-50 text-xs uppercase text-slate-500">
-            <tr>
-              <th className="px-4 py-3 font-medium">Nombre</th>
-              <th className="px-4 py-3 font-medium">Descripción</th>
-              <th className="px-4 py-3 font-medium">Estado</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {visibles.map((m) => {
-              const activa = m.id === seleccionadaId;
-              return (
-                <tr
-                  key={m.id}
-                  aria-selected={activa}
-                  onClick={() => puedeEditar && setSeleccionadaId(activa ? null : m.id)}
-                  onDoubleClick={() => {
-                    if (!puedeEditar) return;
-                    setSeleccionadaId(m.id);
-                    if (!m.protegido) setVentana("editar");
-                  }}
-                  className={claseFila(puedeEditar, activa)}
-                >
-                  <td className="px-4 py-3 font-semibold">
-                    {m.nombre}
-                    {m.protegido && (
-                      <span className="ml-2 align-middle">
-                        <Insignia color="marca">Predeterminada</Insignia>
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-slate-500">{m.descripcion}</td>
-                  <td className="px-4 py-3">
-                    {m.activa ? <Insignia color="verde">Activo</Insignia> : <Insignia color="gris">Inactivo</Insignia>}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className={claseTablaDesplazable}>
+          <table className="w-full text-left text-sm">
+            <thead className={claseEncabezadoFijo}>
+              <tr>
+                <th className="px-4 py-3 font-medium">Nombre</th>
+                <th className="px-4 py-3 font-medium">Descripción</th>
+                <th className="px-4 py-3 font-medium">Estado</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {visibles.map((m) => {
+                const activa = m.id === seleccionadaId;
+                return (
+                  <tr
+                    key={m.id}
+                    aria-selected={activa}
+                    onClick={() => puedeEditar && setSeleccionadaId(activa ? null : m.id)}
+                    onDoubleClick={() => {
+                      if (!puedeEditar) return;
+                      setSeleccionadaId(m.id);
+                      if (!m.protegido) setVentana("editar");
+                    }}
+                    className={claseFila(puedeEditar, activa)}
+                  >
+                    <td className="px-4 py-3 font-semibold">
+                      {m.nombre}
+                      {m.protegido && (
+                        <span className="ml-2 align-middle">
+                          <Insignia color="marca">Predeterminada</Insignia>
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-slate-500">{m.descripcion}</td>
+                    <td className="px-4 py-3">
+                      {m.activa ? <Insignia color="verde">Activo</Insignia> : <Insignia color="gris">Inactivo</Insignia>}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
         {visibles.length === 0 && (
           <p className="py-8 text-center text-sm text-slate-500">
             {elementos.length === 0 ? `Todavía no hay ${textos.plural}.` : "Ningún registro coincide con la búsqueda."}

@@ -247,3 +247,9 @@ export function VentanaFormulario({
 export function claseFila(seleccionable: boolean, seleccionada: boolean) {
   return `${seleccionable ? "cursor-pointer select-none" : ""} ${seleccionada ? "bg-marca-100" : "hover:bg-crema-50"}`;
 }
+
+// La tabla se desplaza dentro de su recuadro (con su propia barra) y los
+// títulos de las columnas quedan fijos arriba.
+export const claseTablaDesplazable = "max-h-[calc(100dvh-19rem)] min-h-40 overflow-auto border-t border-slate-300";
+export const claseEncabezadoFijo =
+  "sticky top-0 z-10 bg-crema-50 text-xs uppercase text-slate-500 shadow-[inset_0_-1px_0_var(--color-slate-300)]";

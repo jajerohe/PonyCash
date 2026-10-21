@@ -6,7 +6,9 @@ import {
   BarraAcciones,
   CabeceraListado,
   VentanaFormulario,
+  claseEncabezadoFijo,
   claseFila,
+  claseTablaDesplazable,
   normalizar,
   useListado,
 } from "@/components/listado";
@@ -98,7 +100,7 @@ export function ListadoTarifas({
 
       <Aviso estado={aviso} />
 
-      <section className="overflow-x-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         {puedeEditar && tarifas.length > 0 && (
           <p className="mb-3 text-xs text-slate-500">
             Haz clic en una fila para seleccionarla; doble clic para editarla.
@@ -106,54 +108,56 @@ export function ListadoTarifas({
               " La tarifa predeterminada de la manilla solo permite cambiar el valor y las fechas."}
           </p>
         )}
-        <table className="w-full text-left text-sm">
-          <thead className="border-y border-slate-300 bg-crema-50 text-xs uppercase text-slate-500">
-            <tr>
-              <th className="px-4 py-3 font-medium">Manilla</th>
-              <th className="px-4 py-3 font-medium">Tipo</th>
-              <th className="px-4 py-3 text-right font-medium">Valor</th>
-              <th className="px-4 py-3 font-medium">Desde</th>
-              <th className="px-4 py-3 font-medium">Hasta</th>
-              <th className="px-4 py-3 font-medium">Vigencia</th>
-              <th className="px-4 py-3 font-medium">Estado</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {visibles.map((t) => {
-              const activa = t.id === seleccionadaId;
-              return (
-                <tr
-                  key={t.id}
-                  aria-selected={activa}
-                  onClick={() => puedeEditar && setSeleccionadaId(activa ? null : t.id)}
-                  onDoubleClick={() => {
-                    if (!puedeEditar) return;
-                    setSeleccionadaId(t.id);
-                    setVentana("editar");
-                  }}
-                  className={claseFila(puedeEditar, activa)}
-                >
-                  <td className="px-4 py-3 font-semibold">{t.manilla}</td>
-                  <td className="px-4 py-3 text-slate-500">
-                    {t.tipo}
-                    {t.predeterminada && (
-                      <span className="ml-2 align-middle">
-                        <Insignia color="marca">Predeterminada</Insignia>
-                      </span>
-                    )}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums">{formatearPesos(t.valor)}</td>
-                  <td className="whitespace-nowrap px-4 py-3 text-slate-500 tabular-nums">{formatearFecha(t.desde)}</td>
-                  <td className="whitespace-nowrap px-4 py-3 text-slate-500 tabular-nums">{formatearFecha(t.hasta)}</td>
-                  <td className="px-4 py-3">{insigniaVigencia[t.vigencia]}</td>
-                  <td className="px-4 py-3">
-                    {t.activa ? <Insignia color="verde">Activo</Insignia> : <Insignia color="gris">Inactivo</Insignia>}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className={claseTablaDesplazable}>
+          <table className="w-full text-left text-sm">
+            <thead className={claseEncabezadoFijo}>
+              <tr>
+                <th className="px-4 py-3 font-medium">Manilla</th>
+                <th className="px-4 py-3 font-medium">Tipo</th>
+                <th className="px-4 py-3 text-right font-medium">Valor</th>
+                <th className="px-4 py-3 font-medium">Desde</th>
+                <th className="px-4 py-3 font-medium">Hasta</th>
+                <th className="px-4 py-3 font-medium">Vigencia</th>
+                <th className="px-4 py-3 font-medium">Estado</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {visibles.map((t) => {
+                const activa = t.id === seleccionadaId;
+                return (
+                  <tr
+                    key={t.id}
+                    aria-selected={activa}
+                    onClick={() => puedeEditar && setSeleccionadaId(activa ? null : t.id)}
+                    onDoubleClick={() => {
+                      if (!puedeEditar) return;
+                      setSeleccionadaId(t.id);
+                      setVentana("editar");
+                    }}
+                    className={claseFila(puedeEditar, activa)}
+                  >
+                    <td className="px-4 py-3 font-semibold">{t.manilla}</td>
+                    <td className="px-4 py-3 text-slate-500">
+                      {t.tipo}
+                      {t.predeterminada && (
+                        <span className="ml-2 align-middle">
+                          <Insignia color="marca">Predeterminada</Insignia>
+                        </span>
+                      )}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums">{formatearPesos(t.valor)}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-slate-500 tabular-nums">{formatearFecha(t.desde)}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-slate-500 tabular-nums">{formatearFecha(t.hasta)}</td>
+                    <td className="px-4 py-3">{insigniaVigencia[t.vigencia]}</td>
+                    <td className="px-4 py-3">
+                      {t.activa ? <Insignia color="verde">Activo</Insignia> : <Insignia color="gris">Inactivo</Insignia>}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
         {visibles.length === 0 && (
           <p className="py-8 text-center text-sm text-slate-500">
             {tarifas.length === 0
