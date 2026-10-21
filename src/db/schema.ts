@@ -1,7 +1,17 @@
 // Tablas que necesita Better Auth (inicio de sesión) más los campos
 // del plugin "admin" (role, banned, banReason, banExpires, impersonatedBy).
 import { sql } from "drizzle-orm";
-import { boolean, index, pgTable, serial, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  date,
+  index,
+  integer,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -115,4 +125,37 @@ export const tipoTarifa = pgTable(
   },
   // El nombre no se repite aunque cambien mayúsculas ("plena" = "Plena").
   (table) => [uniqueIndex("tipo_tarifa_nombre_unico").on(sql`lower(${table.nombre})`)],
+);
+
+// ---------- Tarifas ----------
+
+// Precio de una manilla para un tipo de tarifa entre dos fechas.
+// Cada manilla nace con una tarifa "predeterminada" (Plena, $0, hasta fin de
+// año): se le puede cambiar el valor y las fechas, pero no desactivar ni eliminar.
+export const tarifa = pgTable(
+  "tarifa",
+  {
+    id: serial("id").primaryKey(),
+    manillaId: integer("manilla_id")
+      .notNull()
+      .references(() => manilla.id, { onDelete: "cascade" }),
+    tipoTarifaId: integer("tipo_tarifa_id")
+      .notNull()
+      .references(() => tipoTarifa.id, { onDelete: "restrict" }),
+    valor: integer("valor").notNull().default(0), // En pesos, sin centavos
+    desde: date("desde", { mode: "string" }).notNull(),
+    hasta: date("hasta", { mode: "string" }).notNull(),
+    activa: boolean("activa").notNull().default(true),
+    predeterminada: boolean("predeterminada").notNull().default(false),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("tarifa_manilla_idx").on(table.manillaId),
+    // Solo una tarifa predeterminada por manilla.
+    uniqueIndex("tarifa_predeterminada_unica").on(table.manillaId).where(sql`${table.predeterminada}`),
+  ],
 );

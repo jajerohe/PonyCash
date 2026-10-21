@@ -141,6 +141,13 @@
       "when": 1792546743138,
       "tag": "0019_tipos_tarifa",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1792547585432,
+      "tag": "0020_tarifas",
+      "breakpoints": true
     }
   ]
 }

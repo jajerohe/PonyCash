@@ -6,7 +6,7 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import { tipoTarifa } from "@/db/schema";
-import { esDuplicado, type Estado } from "@/lib/errores";
+import { esDuplicado, estaEnUso, type Estado } from "@/lib/errores";
 import { requireAdmin } from "@/lib/session";
 
 const PROTEGIDO: Estado = { ok: false, mensaje: "Este tipo de tarifa viene con el sistema y no se puede modificar." };
@@ -62,7 +62,14 @@ export async function eliminarTipoTarifa(id: number): Promise<Estado> {
   const buscado = await buscarEditable(id);
   if ("error" in buscado) return buscado.error;
   const { actual } = buscado;
-  await getDb().delete(tipoTarifa).where(editable(id));
+  try {
+    await getDb().delete(tipoTarifa).where(editable(id));
+  } catch (error) {
+    if (estaEnUso(error)) {
+      return { ok: false, mensaje: `No se puede eliminar "${actual.nombre}": hay tarifas que lo usan. Puedes desactivarlo.` };
+    }
+    throw error;
+  }
   revalidatePath("/tipos-tarifa");
   return { ok: true, mensaje: `Tipo de tarifa "${actual.nombre}" eliminado.` };
 }
