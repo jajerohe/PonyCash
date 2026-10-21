@@ -10,7 +10,7 @@ type Opcion = { href: string; texto: string };
 export type SeccionMenu = { titulo?: string; opciones: Opcion[]; mostrarVacio?: boolean };
 
 function estaActiva(ruta: string, href: string) {
-  return href === "/" ? ruta === "/" : ruta.startsWith(href);
+  return href === "/" ? ruta === "/" : ruta === href || ruta.startsWith(`${href}/`);
 }
 
 // Menú lateral. Recibe solo las opciones que la persona puede ver y resalta
