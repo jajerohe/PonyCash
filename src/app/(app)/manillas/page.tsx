@@ -22,6 +22,7 @@ export default async function ManillasPage() {
         singular: "manilla",
         plural: "manillas",
         nuevo: "Nueva manilla",
+        alEliminar: "También se eliminarán sus tarifas. ",
       }}
       acciones={{ guardar: guardarManilla, cambiarEstado: cambiarEstadoManilla, eliminar: eliminarManilla }}
     />

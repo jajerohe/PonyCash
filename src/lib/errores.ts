@@ -31,3 +31,9 @@ export function esDuplicado(error: unknown) {
   const e = error as { code?: string; cause?: { code?: string } };
   return (e?.code ?? e?.cause?.code) === "23505";
 }
+
+// Código de PostgreSQL cuando otro registro todavía usa el que se quiere borrar.
+export function estaEnUso(error: unknown) {
+  const e = error as { code?: string; cause?: { code?: string } };
+  return (e?.code ?? e?.cause?.code) === "23503";
+}
