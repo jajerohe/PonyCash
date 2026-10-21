@@ -7,6 +7,7 @@ Por ahora tiene:
 - **Mi cuenta**: cada persona cambia su propia contraseña (pide la actual).
 - **¿Olvidaste tu contraseña?**: en el login; envía por correo un enlace (vence en 1 hora) para crear una nueva. Necesita `CORREO_USUARIO` y `CORREO_CONTRASENA` (contraseña de aplicación de Gmail) en los secretos de la app.
 - **Manillas** (grupo Operaciones): listado con buscador; los administradores crean, editan, activan/desactivan y eliminan.
+- **Tipos de Tarifas** (grupo Operaciones): igual que Manillas. Trae la tarifa **Plena**, que no se puede repetir, modificar, desactivar ni eliminar.
 - **Administración de usuarios** (solo administradores): crear, editar nombre y correo, cambiar rol (Administrador o Usuario), cambiar contraseña, bloquear/desbloquear y eliminar.
 
 ## Herramientas
@@ -75,6 +76,7 @@ src/
 ├── components/
 │   ├── ui.tsx                  Botón, campo, tarjeta, insignia
 │   ├── formulario.tsx          Formulario con "Guardando…" y mensajes
+│   ├── catalogo.tsx            Listado con buscador y botones crear/editar/activar/eliminar
 │   └── menu.tsx                Menú lateral
 └── app/
     ├── configurar/             Crear el primer administrador
@@ -84,6 +86,7 @@ src/
         ├── layout.tsx          Menú lateral + contenido
         ├── page.tsx            Inicio
         ├── manillas/           Listado de manillas (crear, editar, activar, eliminar)
+        ├── tipos-tarifa/       Listado de tipos de tarifa (Plena viene protegida)
         └── usuarios/           Administración de usuarios
             ├── page.tsx        Lista
             ├── nuevo/          Crear usuario

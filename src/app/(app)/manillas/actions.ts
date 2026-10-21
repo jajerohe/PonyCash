@@ -5,14 +5,8 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import { manilla } from "@/db/schema";
-import type { Estado } from "@/lib/errores";
+import { esDuplicado, type Estado } from "@/lib/errores";
 import { requireAdmin } from "@/lib/session";
-
-// Código de PostgreSQL cuando se repite un valor que debe ser único.
-function esDuplicado(error: unknown) {
-  const e = error as { code?: string; cause?: { code?: string } };
-  return (e?.code ?? e?.cause?.code) === "23505";
-}
 
 export async function guardarManilla(_estado: Estado, datos: FormData): Promise<Estado> {
   await requireAdmin();

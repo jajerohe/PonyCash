@@ -1,6 +1,7 @@
 // Tablas que necesita Better Auth (inicio de sesión) más los campos
 // del plugin "admin" (role, banned, banReason, banExpires, impersonatedBy).
-import { boolean, index, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { boolean, index, pgTable, serial, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -93,3 +94,25 @@ export const manilla = pgTable("manilla", {
     .$onUpdate(() => new Date())
     .notNull(),
 });
+
+// ---------- Tipos de tarifa ----------
+
+// Tipos de tarifa (Plena, Promoción…). Los marcados como "protegido" vienen
+// con el sistema (la tarifa Plena) y no se pueden cambiar ni eliminar.
+export const tipoTarifa = pgTable(
+  "tipo_tarifa",
+  {
+    id: serial("id").primaryKey(),
+    nombre: text("nombre").notNull(),
+    descripcion: text("descripcion"),
+    activa: boolean("activa").notNull().default(true),
+    protegido: boolean("protegido").notNull().default(false),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  // El nombre no se repite aunque cambien mayúsculas ("plena" = "Plena").
+  (table) => [uniqueIndex("tipo_tarifa_nombre_unico").on(sql`lower(${table.nombre})`)],
+);

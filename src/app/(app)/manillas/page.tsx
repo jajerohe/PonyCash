@@ -1,8 +1,9 @@
 import { asc } from "drizzle-orm";
+import { Catalogo } from "@/components/catalogo";
 import { getDb } from "@/db";
 import { manilla } from "@/db/schema";
 import { requireSession } from "@/lib/session";
-import { ListadoManillas } from "./listado";
+import { cambiarEstadoManilla, eliminarManilla, guardarManilla } from "./actions";
 
 export default async function ManillasPage() {
   const { user } = await requireSession();
@@ -11,5 +12,18 @@ export default async function ManillasPage() {
     .from(manilla)
     .orderBy(asc(manilla.nombre));
 
-  return <ListadoManillas manillas={manillas} puedeEditar={user.role === "admin"} />;
+  return (
+    <Catalogo
+      elementos={manillas}
+      puedeEditar={user.role === "admin"}
+      textos={{
+        titulo: "Listado de Manillas",
+        buscar: "Buscar manilla",
+        singular: "manilla",
+        plural: "manillas",
+        nuevo: "Nueva manilla",
+      }}
+      acciones={{ guardar: guardarManilla, cambiarEstado: cambiarEstadoManilla, eliminar: eliminarManilla }}
+    />
+  );
 }

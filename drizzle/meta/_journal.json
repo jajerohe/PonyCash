@@ -134,6 +134,13 @@
       "when": 1792543047164,
       "tag": "0018_manillas_listado",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1792546743138,
+      "tag": "0019_tipos_tarifa",
+      "breakpoints": true
     }
   ]
 }
