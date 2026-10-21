@@ -1,6 +1,6 @@
 // Tablas que necesita Better Auth (inicio de sesión) más los campos
 // del plugin "admin" (role, banned, banReason, banExpires, impersonatedBy).
-import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, index, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -79,3 +79,17 @@ export const verification = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
+// ---------- Manillas ----------
+
+// Manillas que se venden en el parque (Adulto, Niño, Pasaporte…).
+export const manilla = pgTable("manilla", {
+  id: serial("id").primaryKey(),
+  nombre: text("nombre").notNull().unique(),
+  descripcion: text("descripcion"),
+  activa: boolean("activa").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});

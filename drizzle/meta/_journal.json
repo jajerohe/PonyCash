@@ -127,6 +127,13 @@
       "when": 1792535710818,
       "tag": "0017_quitar_perfiles",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792543047164,
+      "tag": "0018_manillas_listado",
+      "breakpoints": true
     }
   ]
 }
