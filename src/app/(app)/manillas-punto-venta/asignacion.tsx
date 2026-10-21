@@ -94,7 +94,7 @@ export function ManillasPorPunto({
 
       {puntos.length === 0 ? (
         <p className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500 shadow-sm">
-          Todavía no hay puntos de venta. Créalos en Operaciones → Puntos de Venta.
+          Todavía no hay puntos de venta. Créalos en Configuración → Puntos de Venta.
         </p>
       ) : (
         <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
