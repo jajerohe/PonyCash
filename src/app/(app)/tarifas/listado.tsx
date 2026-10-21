@@ -13,6 +13,7 @@ import {
 import { Campo, Insignia, Selector } from "@/components/ui";
 import { formatearFecha, formatearPesos, type Vigencia } from "@/lib/fechas";
 import { cambiarEstadoTarifa, eliminarTarifa, guardarTarifa } from "./actions";
+import { CargaTarifas } from "./carga-excel";
 
 type Tarifa = {
   id: number;
@@ -53,6 +54,7 @@ export function ListadoTarifas({
   puedeEditar: boolean;
 }) {
   const [busqueda, setBusqueda] = useState("");
+  const [cargando, setCargando] = useState(false);
   const { seleccionadaId, setSeleccionadaId, ventana, setVentana, aviso, setAviso, ocupado, ejecutar } = useListado();
 
   const filtro = normalizar(busqueda.trim());
@@ -88,6 +90,7 @@ export function ListadoTarifas({
                 if (!window.confirm(pregunta)) return;
                 ejecutar(() => eliminarTarifa(seleccionada.id), () => setSeleccionadaId(null));
               }}
+              onCargar={() => setCargando(true)}
             />
           )
         }
@@ -159,6 +162,16 @@ export function ListadoTarifas({
           </p>
         )}
       </section>
+
+      {cargando && (
+        <CargaTarifas
+          onCerrar={() => setCargando(false)}
+          onCargado={(estado) => {
+            setAviso(estado);
+            setCargando(false);
+          }}
+        />
+      )}
 
       {ventana && (
         <VentanaFormulario
