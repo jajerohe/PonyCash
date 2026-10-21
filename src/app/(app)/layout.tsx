@@ -10,8 +10,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   const esAdmin = user.role === "admin";
   const secciones: SeccionMenu[] = [
     { opciones: [{ href: "/", texto: "Inicio" }] },
-    // Operaciones queda listo para los módulos que se agreguen.
-    { titulo: "Operaciones", opciones: [], mostrarVacio: true },
+    { titulo: "Operaciones", opciones: [{ href: "/manillas", texto: "Manillas" }] },
     {
       titulo: "Administración",
       opciones: [
