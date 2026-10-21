@@ -11,7 +11,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   const secciones: SeccionMenu[] = [
     { opciones: [{ href: "/", texto: "Inicio" }] },
     {
-      titulo: "Operaciones",
+      titulo: "Configuración",
       opciones: [
         { href: "/manillas", texto: "Manillas" },
         { href: "/tipos-tarifa", texto: "Tipos de Tarifas" },

@@ -6,12 +6,12 @@ Por ahora tiene:
 - **Inicio de sesión** con correo y contraseña.
 - **Mi cuenta**: cada persona cambia su propia contraseña (pide la actual).
 - **¿Olvidaste tu contraseña?**: en el login; envía por correo un enlace (vence en 1 hora) para crear una nueva. Necesita `CORREO_USUARIO` y `CORREO_CONTRASENA` (contraseña de aplicación de Gmail) en los secretos de la app.
-- **Manillas** (grupo Operaciones): listado con buscador; los administradores crean, editan, activan/desactivan y eliminan.
-- **Tipos de Tarifas** (grupo Operaciones): igual que Manillas. Trae la tarifa **Plena**, que no se puede repetir, modificar, desactivar ni eliminar.
-- **Tarifas** (grupo Operaciones): precio de cada manilla por tipo de tarifa entre dos fechas, con su vigencia (Vigente, Vencida o Próxima). Cada manilla nueva recibe una tarifa **Plena** predeterminada de $0, desde el día en que se crea hasta el 31 de diciembre; a esa tarifa se le pueden cambiar el valor y las fechas, pero no se puede desactivar ni eliminar. No se permiten dos tarifas activas del mismo tipo y manilla con fechas que se crucen.
+- **Manillas** (grupo Configuración): listado con buscador; los administradores crean, editan, activan/desactivan y eliminan.
+- **Tipos de Tarifas** (grupo Configuración): igual que Manillas. Trae la tarifa **Plena**, que no se puede repetir, modificar, desactivar ni eliminar.
+- **Tarifas** (grupo Configuración): precio de cada manilla por tipo de tarifa entre dos fechas, con su vigencia (Vigente, Vencida o Próxima). Cada manilla nueva recibe una tarifa **Plena** predeterminada de $0, desde el día en que se crea hasta el 31 de diciembre; a esa tarifa se le pueden cambiar el valor y las fechas, pero no se puede desactivar ni eliminar. No se permiten dos tarifas activas del mismo tipo y manilla con fechas que se crucen.
   - **Cargar archivo** (botón morado): carga muchas tarifas a la vez desde Excel con la plantilla `public/plantilla-tarifas.xlsx`. Muestra cada fila revisada (nueva, actualiza o error) y solo guarda si no hay errores.
-- **Puntos de Venta** (grupo Operaciones): taquillas o lugares de venta, igual que Manillas (nombre único, sin importar mayúsculas).
-- **Manillas por Punto de Venta** (grupo Operaciones): se elige un punto de venta y se marcan las manillas que puede vender (las inactivas no se pueden marcar).
+- **Puntos de Venta** (grupo Configuración): taquillas o lugares de venta, igual que Manillas (nombre único, sin importar mayúsculas).
+- **Manillas por Punto de Venta** (grupo Configuración): se elige un punto de venta y se marcan las manillas que puede vender (las inactivas no se pueden marcar).
 - **Administración de usuarios** (solo administradores): crear, editar nombre y correo, cambiar rol (Administrador o Usuario), cambiar contraseña, bloquear/desbloquear y eliminar.
 
 ## Herramientas
