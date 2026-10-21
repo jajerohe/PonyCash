@@ -9,6 +9,7 @@ Por ahora tiene:
 - **Manillas** (grupo Operaciones): listado con buscador; los administradores crean, editan, activan/desactivan y eliminan.
 - **Tipos de Tarifas** (grupo Operaciones): igual que Manillas. Trae la tarifa **Plena**, que no se puede repetir, modificar, desactivar ni eliminar.
 - **Tarifas** (grupo Operaciones): precio de cada manilla por tipo de tarifa entre dos fechas, con su vigencia (Vigente, Vencida o Próxima). Cada manilla nueva recibe una tarifa **Plena** predeterminada de $0, desde el día en que se crea hasta el 31 de diciembre; a esa tarifa se le pueden cambiar el valor y las fechas, pero no se puede desactivar ni eliminar. No se permiten dos tarifas activas del mismo tipo y manilla con fechas que se crucen.
+  - **Cargar archivo** (botón morado): carga muchas tarifas a la vez desde Excel con la plantilla `public/plantilla-tarifas.xlsx`. Muestra cada fila revisada (nueva, actualiza o error) y solo guarda si no hay errores.
 - **Administración de usuarios** (solo administradores): crear, editar nombre y correo, cambiar rol (Administrador o Usuario), cambiar contraseña, bloquear/desbloquear y eliminar.
 
 ## Herramientas
@@ -90,6 +91,7 @@ src/
         ├── manillas/           Listado de manillas (crear, editar, activar, eliminar)
         ├── tipos-tarifa/       Listado de tipos de tarifa (Plena viene protegida)
         ├── tarifas/            Listado de tarifas por manilla, tipo y fechas
+        │   └── carga.ts        Revisión y carga de tarifas desde Excel
         └── usuarios/           Administración de usuarios
             ├── page.tsx        Lista
             ├── nuevo/          Crear usuario

@@ -7,10 +7,7 @@ import { startTransition, useActionState, useEffect, useState, type ReactNode } 
 import { Boton } from "@/components/ui";
 import type { Estado } from "@/lib/errores";
 
-// Quita tildes y mayúsculas para que "nino" encuentre "Niño".
-export function normalizar(texto: string) {
-  return texto.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
-}
+export { normalizar } from "@/lib/texto";
 
 // Fila seleccionada, ventana abierta, aviso y acciones en curso.
 export function useListado() {
@@ -118,6 +115,7 @@ export function BarraAcciones({
   onEditar,
   onCambiarEstado,
   onEliminar,
+  onCargar,
 }: {
   singular: string;
   activa: boolean;
@@ -128,6 +126,8 @@ export function BarraAcciones({
   onEditar: () => void;
   onCambiarEstado: () => void;
   onEliminar: () => void;
+  // Si se pasa, aparece un quinto botón para cargar registros desde un archivo.
+  onCargar?: () => void;
 }) {
   return (
     <div className="flex gap-3 rounded-xl bg-crema-100/70 px-4 py-3">
@@ -158,6 +158,13 @@ export function BarraAcciones({
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v6m4-6v6" />
         </svg>
       </BotonAccion>
+      {onCargar && (
+        <BotonAccion titulo="Cargar archivo" color="bg-violet-500" onClick={onCargar}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className={icono} aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 15V4m0 0-4 4m4-4 4 4M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+          </svg>
+        </BotonAccion>
+      )}
     </div>
   );
 }
@@ -179,6 +186,8 @@ export function VentanaFormulario({
   accion,
   onCerrar,
   onGuardado,
+  ancha,
+  sinEnviar,
   children,
 }: {
   titulo: string;
@@ -186,6 +195,8 @@ export function VentanaFormulario({
   accion: (estado: Estado, datos: FormData) => Promise<Estado>;
   onCerrar: () => void;
   onGuardado: (estado: Estado) => void;
+  ancha?: boolean;
+  sinEnviar?: boolean; // Deshabilita el botón de guardar
   children: ReactNode;
 }) {
   const [estado, enviar, pendiente] = useActionState(accion, null);
@@ -200,7 +211,7 @@ export function VentanaFormulario({
         role="dialog"
         aria-modal="true"
         aria-labelledby="titulo-ventana"
-        className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+        className={`max-h-[90vh] w-full overflow-y-auto rounded-2xl bg-white p-6 shadow-xl ${ancha ? "max-w-4xl" : "max-w-md"}`}
         onClick={(e) => e.stopPropagation()}
       >
         <h2 id="titulo-ventana" className="mb-4 text-lg font-semibold">
@@ -222,7 +233,7 @@ export function VentanaFormulario({
             <Boton type="button" variante="secundario" onClick={onCerrar}>
               Cancelar
             </Boton>
-            <Boton type="submit" disabled={pendiente}>
+            <Boton type="submit" disabled={pendiente || sinEnviar}>
               {pendiente ? "Guardando…" : textoBoton}
             </Boton>
           </div>
