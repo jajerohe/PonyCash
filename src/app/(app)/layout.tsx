@@ -17,6 +17,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
         { href: "/tipos-tarifa", texto: "Tipos de Tarifas" },
         { href: "/tarifas", texto: "Tarifas" },
         { href: "/puntos-venta", texto: "Puntos de Venta" },
+        { href: "/manillas-punto-venta", texto: "Manillas por Punto de Venta" },
       ],
     },
     {

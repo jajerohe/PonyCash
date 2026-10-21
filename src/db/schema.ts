@@ -7,6 +7,7 @@ import {
   index,
   integer,
   pgTable,
+  primaryKey,
   serial,
   text,
   timestamp,
@@ -178,4 +179,22 @@ export const puntoVenta = pgTable(
   },
   // El nombre no se repite aunque cambien mayúsculas.
   (table) => [uniqueIndex("punto_venta_nombre_unico").on(sql`lower(${table.nombre})`)],
+);
+
+// Qué manillas puede vender cada punto de venta.
+export const puntoVentaManilla = pgTable(
+  "punto_venta_manilla",
+  {
+    puntoVentaId: integer("punto_venta_id")
+      .notNull()
+      .references(() => puntoVenta.id, { onDelete: "cascade" }),
+    manillaId: integer("manilla_id")
+      .notNull()
+      .references(() => manilla.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.puntoVentaId, table.manillaId] }),
+    index("punto_venta_manilla_manilla_idx").on(table.manillaId),
+  ],
 );
