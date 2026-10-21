@@ -1,6 +1,6 @@
 "use client";
 
-// Piezas compartidas de los listados (manillas, tipos de tarifa, tarifas…):
+// Piezas compartidas de los listados (productos, tipos de tarifa, tarifas…):
 // cabecera con buscador, barra de botones redondos, ventana con formulario
 // y el estado de la fila seleccionada.
 import { startTransition, useActionState, useEffect, useState, type ReactNode } from "react";

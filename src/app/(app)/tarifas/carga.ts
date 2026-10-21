@@ -6,7 +6,7 @@
 import { eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
-import { manilla, tarifa, tipoTarifa } from "@/db/schema";
+import { producto, tarifa, tipoTarifa } from "@/db/schema";
 import type { Estado } from "@/lib/errores";
 import { esFechaValida } from "@/lib/fechas";
 import { requireAdmin } from "@/lib/session";
@@ -14,7 +14,7 @@ import { normalizar } from "@/lib/texto";
 
 export type FilaArchivo = {
   fila: number; // Número de fila en Excel, para los mensajes
-  manilla: string;
+  producto: string;
   tipo: string;
   valor: string;
   desde: string;
@@ -23,7 +23,7 @@ export type FilaArchivo = {
 
 export type FilaRevisada = {
   fila: number;
-  manilla: string;
+  producto: string;
   tipo: string;
   valor: number | null;
   desde: string;
@@ -59,19 +59,19 @@ function leerFecha(texto: string) {
 const seCruzan = (a: { desde: string; hasta: string }, b: { desde: string; hasta: string }) =>
   a.desde <= b.hasta && b.desde <= a.hasta;
 
-// Revisa cada fila. Una fila de una manilla y tipo que ya tiene tarifa activa
+// Revisa cada fila. Una fila de un producto y tipo que ya tiene tarifa activa
 // con fechas que se cruzan actualiza esa tarifa solo si es la predeterminada
-// de la manilla o si tiene exactamente las mismas fechas; si no, es un error.
+// del producto o si tiene exactamente las mismas fechas; si no, es un error.
 async function analizar(entrada: unknown): Promise<Revision> {
   const filasArchivo = leerEntrada(entrada);
   const db = getDb();
-  const [manillas, tipos, existentes] = await Promise.all([
-    db.select({ id: manilla.id, nombre: manilla.nombre, activa: manilla.activa }).from(manilla),
+  const [productos, tipos, existentes] = await Promise.all([
+    db.select({ id: producto.id, nombre: producto.nombre, activa: producto.activa }).from(producto),
     db.select({ id: tipoTarifa.id, nombre: tipoTarifa.nombre, activa: tipoTarifa.activa }).from(tipoTarifa),
     db
       .select({
         id: tarifa.id,
-        manillaId: tarifa.manillaId,
+        productoId: tarifa.productoId,
         tipoTarifaId: tarifa.tipoTarifaId,
         desde: tarifa.desde,
         hasta: tarifa.hasta,
@@ -80,25 +80,25 @@ async function analizar(entrada: unknown): Promise<Revision> {
       .from(tarifa)
       .where(eq(tarifa.activa, true)),
   ]);
-  const manillaPorNombre = new Map(manillas.map((m) => [normalizar(m.nombre.trim()), m]));
+  const productoPorNombre = new Map(productos.map((m) => [normalizar(m.nombre.trim()), m]));
   const tipoPorNombre = new Map(tipos.map((t) => [normalizar(t.nombre.trim()), t]));
 
   // Lo que ya aceptaron las filas anteriores del archivo.
-  const aceptadas: { fila: number; manillaId: number; tipoTarifaId: number; desde: string; hasta: string }[] = [];
+  const aceptadas: { fila: number; productoId: number; tipoTarifaId: number; desde: string; hasta: string }[] = [];
   const actualizadas = new Map<number, number>(); // id de tarifa → fila que la actualiza
 
   const filas: FilaRevisada[] = filasArchivo.map((f) => {
-    const base = { fila: f.fila, manilla: f.manilla, tipo: f.tipo, desde: f.desde, hasta: f.hasta };
+    const base = { fila: f.fila, producto: f.producto, tipo: f.tipo, desde: f.desde, hasta: f.hasta };
     const valor = leerValor(f.valor);
     const error = (mensaje: string): FilaRevisada => ({ ...base, valor, accion: "error", mensaje });
 
-    const m = manillaPorNombre.get(normalizar(f.manilla.trim()));
+    const m = productoPorNombre.get(normalizar(f.producto.trim()));
     const t = tipoPorNombre.get(normalizar(f.tipo.trim()));
     const desde = leerFecha(f.desde.trim());
     const hasta = leerFecha(f.hasta.trim());
-    if (!f.manilla.trim()) return error("Falta la manilla.");
-    if (!m) return error(`No existe la manilla "${f.manilla}".`);
-    if (!m.activa) return error(`La manilla "${m.nombre}" está inactiva.`);
+    if (!f.producto.trim()) return error("Falta el producto.");
+    if (!m) return error(`No existe el producto "${f.producto}".`);
+    if (!m.activa) return error(`El producto "${m.nombre}" está inactivo.`);
     if (!f.tipo.trim()) return error("Falta el tipo de tarifa.");
     if (!t) return error(`No existe el tipo de tarifa "${f.tipo}".`);
     if (!t.activa) return error(`El tipo de tarifa "${t.nombre}" está inactivo.`);
@@ -107,16 +107,16 @@ async function analizar(entrada: unknown): Promise<Revision> {
     if (!hasta) return error("Fecha hasta inválida (usa DD/MM/AAAA).");
     if (hasta < desde) return error("La fecha hasta es anterior a la fecha desde.");
 
-    const datos = { manillaId: m.id, tipoTarifaId: t.id, desde, hasta };
-    const nombres = { ...base, manilla: m.nombre, tipo: t.nombre, desde, hasta, valor };
+    const datos = { productoId: m.id, tipoTarifaId: t.id, desde, hasta };
+    const nombres = { ...base, producto: m.nombre, tipo: t.nombre, desde, hasta, valor };
 
     const repetida = aceptadas.find(
-      (a) => a.manillaId === m.id && a.tipoTarifaId === t.id && seCruzan(a, datos),
+      (a) => a.productoId === m.id && a.tipoTarifaId === t.id && seCruzan(a, datos),
     );
     if (repetida) return { ...nombres, accion: "error", mensaje: `Se cruza con la fila ${repetida.fila} del archivo.` };
 
     const cruces = existentes.filter(
-      (e) => e.manillaId === m.id && e.tipoTarifaId === t.id && seCruzan(e, datos),
+      (e) => e.productoId === m.id && e.tipoTarifaId === t.id && seCruzan(e, datos),
     );
     let accion: FilaRevisada["accion"] = "nueva";
     let mensaje = "Tarifa nueva.";
@@ -127,7 +127,7 @@ async function analizar(entrada: unknown): Promise<Revision> {
         return {
           ...nombres,
           accion: "error",
-          mensaje: "Ya hay una tarifa activa de ese tipo para la manilla con fechas que se cruzan.",
+          mensaje: "Ya hay una tarifa activa de ese tipo para el producto con fechas que se cruzan.",
         };
       }
       if (actualizadas.has(objetivo.id)) {
@@ -136,7 +136,7 @@ async function analizar(entrada: unknown): Promise<Revision> {
       actualizadas.set(objetivo.id, f.fila);
       accion = "actualiza";
       mensaje = objetivo.predeterminada
-        ? "Actualiza la tarifa predeterminada de la manilla."
+        ? "Actualiza la tarifa predeterminada del producto."
         : "Actualiza el valor de la tarifa con esas mismas fechas.";
     }
     aceptadas.push({ fila: f.fila, ...datos });
@@ -160,7 +160,7 @@ function leerEntrada(entrada: unknown): FilaArchivo[] {
     const texto = (v: unknown) => (typeof v === "string" || typeof v === "number" ? String(v).slice(0, 200) : "");
     return {
       fila: Number.isInteger(o.fila) ? (o.fila as number) : i + 2,
-      manilla: texto(o.manilla),
+      producto: texto(o.producto),
       tipo: texto(o.tipo),
       valor: texto(o.valor),
       desde: texto(o.desde),
@@ -192,29 +192,29 @@ export async function confirmarCarga(_estado: Estado, datos: FormData): Promise<
     return { ok: false, mensaje: `Hay ${revision.errores} fila(s) con errores. Corrígelas en el archivo y vuelve a cargarlo.` };
   }
 
-  // Ids de manillas y tipos ya validados, por nombre.
+  // Ids de productos y tipos ya validados, por nombre.
   const db = getDb();
-  const nombresManilla = [...new Set(revision.filas.map((f) => f.manilla))];
+  const nombresProducto = [...new Set(revision.filas.map((f) => f.producto))];
   const nombresTipo = [...new Set(revision.filas.map((f) => f.tipo))];
-  const [manillas, tipos, existentes] = await Promise.all([
-    db.select({ id: manilla.id, nombre: manilla.nombre }).from(manilla).where(inArray(manilla.nombre, nombresManilla)),
+  const [productos, tipos, existentes] = await Promise.all([
+    db.select({ id: producto.id, nombre: producto.nombre }).from(producto).where(inArray(producto.nombre, nombresProducto)),
     db.select({ id: tipoTarifa.id, nombre: tipoTarifa.nombre }).from(tipoTarifa).where(inArray(tipoTarifa.nombre, nombresTipo)),
     db.select().from(tarifa).where(eq(tarifa.activa, true)),
   ]);
-  const idManilla = new Map(manillas.map((m) => [m.nombre, m.id]));
+  const idProducto = new Map(productos.map((m) => [m.nombre, m.id]));
   const idTipo = new Map(tipos.map((t) => [t.nombre, t.id]));
 
   await db.transaction(async (tx) => {
     const nuevas = [];
     for (const f of revision.filas) {
-      const manillaId = idManilla.get(f.manilla)!;
+      const productoId = idProducto.get(f.producto)!;
       const tipoTarifaId = idTipo.get(f.tipo)!;
-      const valores = { manillaId, tipoTarifaId, valor: f.valor!, desde: f.desde, hasta: f.hasta };
+      const valores = { productoId, tipoTarifaId, valor: f.valor!, desde: f.desde, hasta: f.hasta };
       if (f.accion === "nueva") {
         nuevas.push(valores);
       } else {
         const objetivo = existentes.find(
-          (e) => e.manillaId === manillaId && e.tipoTarifaId === tipoTarifaId && seCruzan(e, f),
+          (e) => e.productoId === productoId && e.tipoTarifaId === tipoTarifaId && seCruzan(e, f),
         )!;
         await tx
           .update(tarifa)

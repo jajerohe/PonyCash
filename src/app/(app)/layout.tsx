@@ -13,11 +13,11 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
     {
       titulo: "Configuración",
       opciones: [
-        { href: "/manillas", texto: "Manillas" },
+        { href: "/productos", texto: "Productos" },
         { href: "/tipos-tarifa", texto: "Tipos de Tarifas" },
         { href: "/tarifas", texto: "Tarifas" },
         { href: "/puntos-venta", texto: "Puntos de Venta" },
-        { href: "/manillas-punto-venta", texto: "Manillas por Punto de Venta" },
+        { href: "/productos-punto-venta", texto: "Productos por Punto de Venta" },
       ],
     },
     {

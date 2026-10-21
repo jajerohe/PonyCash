@@ -19,8 +19,8 @@ import { CargaTarifas } from "./carga-excel";
 
 type Tarifa = {
   id: number;
-  manillaId: number;
-  manilla: string;
+  productoId: number;
+  producto: string;
   tipoTarifaId: number;
   tipo: string;
   valor: number;
@@ -46,12 +46,12 @@ function opcionesPara(opciones: Opcion[], actualId?: number) {
 
 export function ListadoTarifas({
   tarifas,
-  manillas,
+  productos,
   tipos,
   puedeEditar,
 }: {
   tarifas: Tarifa[];
-  manillas: Opcion[];
+  productos: Opcion[];
   tipos: Opcion[];
   puedeEditar: boolean;
 }) {
@@ -60,7 +60,7 @@ export function ListadoTarifas({
   const { seleccionadaId, setSeleccionadaId, ventana, setVentana, aviso, setAviso, ocupado, ejecutar } = useListado();
 
   const filtro = normalizar(busqueda.trim());
-  const visibles = tarifas.filter((t) => normalizar(`${t.manilla} ${t.tipo}`).includes(filtro));
+  const visibles = tarifas.filter((t) => normalizar(`${t.producto} ${t.tipo}`).includes(filtro));
   const seleccionada = tarifas.find((t) => t.id === seleccionadaId) ?? null;
   const sinEditar = !seleccionada || ocupado;
   // La predeterminada se puede editar, pero no desactivar ni eliminar.
@@ -72,7 +72,7 @@ export function ListadoTarifas({
       <CabeceraListado
         titulo="Listado de Tarifas"
         buscar="Buscar tarifa"
-        placeholder="Digite manilla o tipo de tarifa"
+        placeholder="Digite producto o tipo de tarifa"
         busqueda={busqueda}
         onBuscar={setBusqueda}
         botones={
@@ -88,7 +88,7 @@ export function ListadoTarifas({
               onCambiarEstado={() => seleccionada && ejecutar(() => cambiarEstadoTarifa(seleccionada.id))}
               onEliminar={() => {
                 if (!seleccionada) return;
-                const pregunta = `¿Eliminar la tarifa ${seleccionada.tipo} de "${seleccionada.manilla}"? No se puede deshacer.`;
+                const pregunta = `¿Eliminar la tarifa ${seleccionada.tipo} de "${seleccionada.producto}"? No se puede deshacer.`;
                 if (!window.confirm(pregunta)) return;
                 ejecutar(() => eliminarTarifa(seleccionada.id), () => setSeleccionadaId(null));
               }}
@@ -105,14 +105,14 @@ export function ListadoTarifas({
           <p className="mb-3 text-xs text-slate-500">
             Haz clic en una fila para seleccionarla; doble clic para editarla.
             {seleccionada?.predeterminada &&
-              " La tarifa predeterminada de la manilla solo permite cambiar el valor y las fechas."}
+              " La tarifa predeterminada del producto solo permite cambiar el valor y las fechas."}
           </p>
         )}
         <div className={claseTablaDesplazable}>
           <table className="w-full text-left text-sm">
             <thead className={claseEncabezadoFijo}>
               <tr>
-                <th className="px-4 py-3 font-medium">Manilla</th>
+                <th className="px-4 py-3 font-medium">Producto</th>
                 <th className="px-4 py-3 font-medium">Tipo</th>
                 <th className="px-4 py-3 text-right font-medium">Valor</th>
                 <th className="px-4 py-3 font-medium">Desde</th>
@@ -136,7 +136,7 @@ export function ListadoTarifas({
                     }}
                     className={claseFila(puedeEditar, activa)}
                   >
-                    <td className="px-4 py-3 font-semibold">{t.manilla}</td>
+                    <td className="px-4 py-3 font-semibold">{t.producto}</td>
                     <td className="px-4 py-3 text-slate-500">
                       {t.tipo}
                       {t.predeterminada && (
@@ -161,7 +161,7 @@ export function ListadoTarifas({
         {visibles.length === 0 && (
           <p className="py-8 text-center text-sm text-slate-500">
             {tarifas.length === 0
-              ? "Todavía no hay tarifas. Cada manilla nueva trae su tarifa Plena."
+              ? "Todavía no hay tarifas. Cada producto nuevo trae su tarifa Plena."
               : "Ninguna tarifa coincide con la búsqueda."}
           </p>
         )}
@@ -191,17 +191,17 @@ export function ListadoTarifas({
         >
           <input type="hidden" name="id" value={editando?.id ?? 0} />
           {editando?.predeterminada ? (
-            // En la predeterminada la manilla y el tipo no se cambian.
+            // En la predeterminada el producto y el tipo no se cambian.
             <p className="rounded-lg bg-crema-50 px-3 py-2 text-sm text-slate-700">
-              <span className="font-semibold">{editando.manilla}</span> · {editando.tipo} (predeterminada)
+              <span className="font-semibold">{editando.producto}</span> · {editando.tipo} (predeterminada)
             </p>
           ) : (
             <>
-              <Selector etiqueta="Manilla" name="manillaId" defaultValue={editando?.manillaId ?? ""} required>
+              <Selector etiqueta="Producto" name="productoId" defaultValue={editando?.productoId ?? ""} required>
                 <option value="" disabled>
-                  Elige una manilla
+                  Elige un producto
                 </option>
-                {opcionesPara(manillas, editando?.manillaId).map((m) => (
+                {opcionesPara(productos, editando?.productoId).map((m) => (
                   <option key={m.id} value={m.id}>
                     {m.nombre}
                   </option>

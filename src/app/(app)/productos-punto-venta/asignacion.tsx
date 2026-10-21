@@ -1,28 +1,28 @@
 "use client";
 
-// Elegir un punto de venta (izquierda) y marcar las manillas que puede vender (derecha).
+// Elegir un punto de venta (izquierda) y marcar los productos que puede vender (derecha).
 import { useMemo, useState, useTransition } from "react";
 import { Aviso } from "@/components/listado";
 import { Boton, Insignia } from "@/components/ui";
 import type { Estado } from "@/lib/errores";
 import { normalizar } from "@/lib/texto";
-import { guardarManillasDelPunto } from "./actions";
+import { guardarProductosDelPunto } from "./actions";
 
 type Punto = { id: number; nombre: string; descripcion: string | null; activa: boolean };
-type Manilla = { id: number; nombre: string; activa: boolean };
-type Asignacion = { puntoVentaId: number; manillaId: number };
+type Producto = { id: number; nombre: string; activa: boolean };
+type Asignacion = { puntoVentaId: number; productoId: number };
 
 const claseBuscador =
   "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-marca-500 focus:ring-2 focus:ring-marca-200";
 
-export function ManillasPorPunto({
+export function ProductosPorPunto({
   puntos,
-  manillas,
+  productos,
   asignaciones,
   puedeEditar,
 }: {
   puntos: Punto[];
-  manillas: Manilla[];
+  productos: Producto[];
   asignaciones: Asignacion[];
   puedeEditar: boolean;
 }) {
@@ -30,21 +30,21 @@ export function ManillasPorPunto({
   // Marcas sin guardar del punto elegido; null = las guardadas.
   const [borrador, setBorrador] = useState<Set<number> | null>(null);
   const [buscarPunto, setBuscarPunto] = useState("");
-  const [buscarManilla, setBuscarManilla] = useState("");
+  const [buscarProducto, setBuscarProducto] = useState("");
   const [aviso, setAviso] = useState<Estado>(null);
   const [guardando, iniciar] = useTransition();
 
-  // Manillas guardadas de cada punto de venta.
+  // Productos guardados de cada punto de venta.
   const porPunto = useMemo(() => {
     const mapa = new Map<number, Set<number>>();
     for (const a of asignaciones) {
       if (!mapa.has(a.puntoVentaId)) mapa.set(a.puntoVentaId, new Set());
-      mapa.get(a.puntoVentaId)!.add(a.manillaId);
+      mapa.get(a.puntoVentaId)!.add(a.productoId);
     }
     return mapa;
   }, [asignaciones]);
 
-  const activas = manillas.filter((m) => m.activa);
+  const activas = productos.filter((m) => m.activa);
   const cuenta = (marcadas: Set<number> | undefined) => activas.filter((m) => marcadas?.has(m.id)).length;
 
   const punto = puntos.find((p) => p.id === puntoId) ?? null;
@@ -53,7 +53,7 @@ export function ManillasPorPunto({
   const hayCambios = borrador !== null && activas.some((m) => borrador.has(m.id) !== guardadas.has(m.id));
 
   const puntosVisibles = puntos.filter((p) => normalizar(p.nombre).includes(normalizar(buscarPunto.trim())));
-  const manillasVisibles = manillas.filter((m) => normalizar(m.nombre).includes(normalizar(buscarManilla.trim())));
+  const productosVisibles = productos.filter((m) => normalizar(m.nombre).includes(normalizar(buscarProducto.trim())));
 
   function elegirPunto(id: number) {
     if (id === puntoId) return;
@@ -75,7 +75,7 @@ export function ManillasPorPunto({
   function guardar() {
     if (!punto) return;
     iniciar(async () => {
-      const resultado = await guardarManillasDelPunto(punto.id, [...marcadas]);
+      const resultado = await guardarProductosDelPunto(punto.id, [...marcadas]);
       setAviso(resultado);
       if (resultado?.ok) setBorrador(null);
     });
@@ -84,9 +84,9 @@ export function ManillasPorPunto({
   return (
     <div className="max-w-6xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Manillas por Punto de Venta</h1>
+        <h1 className="text-2xl font-bold">Productos por Punto de Venta</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Elige un punto de venta y marca las manillas que se pueden vender allí.
+          Elige un punto de venta y marca los productos que se pueden vender allí.
         </p>
       </div>
 
@@ -152,7 +152,7 @@ export function ManillasPorPunto({
                     <b className="text-slate-700">
                       {cuenta(marcadas)} de {activas.length}
                     </b>{" "}
-                    manillas
+                    productos
                   </p>
                 </div>
                 {puedeEditar && (
@@ -177,16 +177,16 @@ export function ManillasPorPunto({
 
               <input
                 type="search"
-                value={buscarManilla}
-                onChange={(e) => setBuscarManilla(e.target.value)}
-                placeholder="Buscar manilla"
-                aria-label="Buscar manilla"
+                value={buscarProducto}
+                onChange={(e) => setBuscarProducto(e.target.value)}
+                placeholder="Buscar producto"
+                aria-label="Buscar producto"
                 className={`mb-3 ${claseBuscador}`}
               />
 
               <div className="max-h-[calc(100dvh-26rem)] min-h-40 overflow-auto rounded-lg border border-slate-200 text-sm">
-                <div className="sticky top-0 z-10 bg-crema-50 px-4 py-2 text-xs uppercase text-slate-500">Manilla</div>
-                {manillasVisibles.map((m) => (
+                <div className="sticky top-0 z-10 bg-crema-50 px-4 py-2 text-xs uppercase text-slate-500">Producto</div>
+                {productosVisibles.map((m) => (
                   <label
                     key={m.id}
                     className={`flex items-center gap-3 border-b border-slate-100 px-4 py-3 last:border-b-0 ${
@@ -195,7 +195,7 @@ export function ManillasPorPunto({
                   >
                     <input
                       type="checkbox"
-                      name="manilla"
+                      name="producto"
                       value={m.id}
                       checked={marcadas.has(m.id)}
                       disabled={!m.activa || !puedeEditar}
@@ -206,18 +206,18 @@ export function ManillasPorPunto({
                     {!m.activa && <Insignia color="gris">Inactiva</Insignia>}
                   </label>
                 ))}
-                {manillas.length === 0 && (
-                  <p className="px-4 py-6 text-center text-slate-500">Todavía no hay manillas.</p>
+                {productos.length === 0 && (
+                  <p className="px-4 py-6 text-center text-slate-500">Todavía no hay productos.</p>
                 )}
-                {manillas.length > 0 && manillasVisibles.length === 0 && (
-                  <p className="px-4 py-6 text-center text-slate-500">Ninguna manilla coincide.</p>
+                {productos.length > 0 && productosVisibles.length === 0 && (
+                  <p className="px-4 py-6 text-center text-slate-500">Ningun producto coincide.</p>
                 )}
               </div>
 
               {puedeEditar && (
                 <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
                   <p className="text-xs text-slate-500">
-                    {hayCambios ? "Tienes cambios sin guardar." : "Las manillas inactivas no se pueden marcar."}
+                    {hayCambios ? "Tienes cambios sin guardar." : "Los productos inactivos no se pueden marcar."}
                   </p>
                   <div className="flex gap-2">
                     <Boton
