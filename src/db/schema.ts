@@ -91,10 +91,10 @@ export const verification = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
-// ---------- Manillas ----------
+// ---------- Productos ----------
 
-// Manillas que se venden en el parque (Adulto, Niño, Pasaporte…).
-export const manilla = pgTable("manilla", {
+// Productos que se venden en el parque (Adulto, Niño, Pasaporte…).
+export const producto = pgTable("producto", {
   id: serial("id").primaryKey(),
   nombre: text("nombre").notNull().unique(),
   descripcion: text("descripcion"),
@@ -130,16 +130,16 @@ export const tipoTarifa = pgTable(
 
 // ---------- Tarifas ----------
 
-// Precio de una manilla para un tipo de tarifa entre dos fechas.
-// Cada manilla nace con una tarifa "predeterminada" (Plena, $0, hasta fin de
+// Precio de un producto para un tipo de tarifa entre dos fechas.
+// Cada producto nace con una tarifa "predeterminada" (Plena, $0, hasta fin de
 // año): se le puede cambiar el valor y las fechas, pero no desactivar ni eliminar.
 export const tarifa = pgTable(
   "tarifa",
   {
     id: serial("id").primaryKey(),
-    manillaId: integer("manilla_id")
+    productoId: integer("producto_id")
       .notNull()
-      .references(() => manilla.id, { onDelete: "cascade" }),
+      .references(() => producto.id, { onDelete: "cascade" }),
     tipoTarifaId: integer("tipo_tarifa_id")
       .notNull()
       .references(() => tipoTarifa.id, { onDelete: "restrict" }),
@@ -155,15 +155,15 @@ export const tarifa = pgTable(
       .notNull(),
   },
   (table) => [
-    index("tarifa_manilla_idx").on(table.manillaId),
-    // Solo una tarifa predeterminada por manilla.
-    uniqueIndex("tarifa_predeterminada_unica").on(table.manillaId).where(sql`${table.predeterminada}`),
+    index("tarifa_producto_idx").on(table.productoId),
+    // Solo una tarifa predeterminada por producto.
+    uniqueIndex("tarifa_predeterminada_unica").on(table.productoId).where(sql`${table.predeterminada}`),
   ],
 );
 
 // ---------- Puntos de venta ----------
 
-// Taquillas o lugares del parque donde se venden las manillas.
+// Taquillas o lugares del parque donde se venden los productos.
 export const puntoVenta = pgTable(
   "punto_venta",
   {
@@ -181,20 +181,20 @@ export const puntoVenta = pgTable(
   (table) => [uniqueIndex("punto_venta_nombre_unico").on(sql`lower(${table.nombre})`)],
 );
 
-// Qué manillas puede vender cada punto de venta.
-export const puntoVentaManilla = pgTable(
-  "punto_venta_manilla",
+// Qué productos puede vender cada punto de venta.
+export const puntoVentaProducto = pgTable(
+  "punto_venta_producto",
   {
     puntoVentaId: integer("punto_venta_id")
       .notNull()
       .references(() => puntoVenta.id, { onDelete: "cascade" }),
-    manillaId: integer("manilla_id")
+    productoId: integer("producto_id")
       .notNull()
-      .references(() => manilla.id, { onDelete: "cascade" }),
+      .references(() => producto.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    primaryKey({ columns: [table.puntoVentaId, table.manillaId] }),
-    index("punto_venta_manilla_manilla_idx").on(table.manillaId),
+    primaryKey({ columns: [table.puntoVentaId, table.productoId] }),
+    index("punto_venta_producto_producto_idx").on(table.productoId),
   ],
 );

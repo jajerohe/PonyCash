@@ -162,6 +162,13 @@
       "when": 1792554239075,
       "tag": "0022_manillas_punto_venta",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1792599726132,
+      "tag": "0023_manillas_a_productos",
+      "breakpoints": true
     }
   ]
 }

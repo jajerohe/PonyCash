@@ -1,6 +1,6 @@
 import { asc, desc, eq } from "drizzle-orm";
 import { getDb } from "@/db";
-import { manilla, tarifa, tipoTarifa } from "@/db/schema";
+import { producto, tarifa, tipoTarifa } from "@/db/schema";
 import { hoy, vigencia } from "@/lib/fechas";
 import { requireSession } from "@/lib/session";
 import { ListadoTarifas } from "./listado";
@@ -8,12 +8,12 @@ import { ListadoTarifas } from "./listado";
 export default async function TarifasPage() {
   const { user } = await requireSession();
   const db = getDb();
-  const [filas, manillas, tipos] = await Promise.all([
+  const [filas, productos, tipos] = await Promise.all([
     db
       .select({
         id: tarifa.id,
-        manillaId: tarifa.manillaId,
-        manilla: manilla.nombre,
+        productoId: tarifa.productoId,
+        producto: producto.nombre,
         tipoTarifaId: tarifa.tipoTarifaId,
         tipo: tipoTarifa.nombre,
         valor: tarifa.valor,
@@ -23,11 +23,11 @@ export default async function TarifasPage() {
         predeterminada: tarifa.predeterminada,
       })
       .from(tarifa)
-      .innerJoin(manilla, eq(tarifa.manillaId, manilla.id))
+      .innerJoin(producto, eq(tarifa.productoId, producto.id))
       .innerJoin(tipoTarifa, eq(tarifa.tipoTarifaId, tipoTarifa.id))
-      // Por manilla; dentro de cada una, la predeterminada primero y luego las más recientes.
-      .orderBy(asc(manilla.nombre), desc(tarifa.predeterminada), desc(tarifa.desde)),
-    db.select({ id: manilla.id, nombre: manilla.nombre, activa: manilla.activa }).from(manilla).orderBy(asc(manilla.nombre)),
+      // Por producto; dentro de cada una, la predeterminada primero y luego las más recientes.
+      .orderBy(asc(producto.nombre), desc(tarifa.predeterminada), desc(tarifa.desde)),
+    db.select({ id: producto.id, nombre: producto.nombre, activa: producto.activa }).from(producto).orderBy(asc(producto.nombre)),
     db
       .select({ id: tipoTarifa.id, nombre: tipoTarifa.nombre, activa: tipoTarifa.activa })
       .from(tipoTarifa)
@@ -38,5 +38,5 @@ export default async function TarifasPage() {
   const dia = hoy();
   const tarifas = filas.map((t) => ({ ...t, vigencia: vigencia(t.desde, t.hasta, dia) }));
 
-  return <ListadoTarifas tarifas={tarifas} manillas={manillas} tipos={tipos} puedeEditar={user.role === "admin"} />;
+  return <ListadoTarifas tarifas={tarifas} productos={productos} tipos={tipos} puedeEditar={user.role === "admin"} />;
 }

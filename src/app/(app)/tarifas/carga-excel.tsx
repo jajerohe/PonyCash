@@ -12,7 +12,7 @@ import { confirmarCarga, revisarCarga, type FilaArchivo, type Revision } from ".
 
 // Encabezados aceptados para cada columna (sin tildes ni mayúsculas).
 const COLUMNAS: Record<keyof Omit<FilaArchivo, "fila">, string[]> = {
-  manilla: ["manilla", "nombre manilla"],
+  producto: ["producto", "nombre producto", "manilla", "nombre manilla"], // "manilla": plantillas anteriores
   tipo: ["tipo", "tipo tarifa", "tipo de tarifa"],
   valor: ["valor", "precio"],
   desde: ["desde", "fecha desde", "fecha inicio", "inicio"],
@@ -46,13 +46,13 @@ async function leerArchivo(archivo: File): Promise<FilaArchivo[]> {
   return resto
     .map((celdas, i) => ({
       fila: i + 2, // La fila 1 es el encabezado
-      manilla: aTexto(celdas[posicion.manilla]),
+      producto: aTexto(celdas[posicion.producto]),
       tipo: aTexto(celdas[posicion.tipo]),
       valor: aTexto(celdas[posicion.valor]),
       desde: aTexto(celdas[posicion.desde]),
       hasta: aTexto(celdas[posicion.hasta]),
     }))
-    .filter((f) => f.manilla || f.tipo || f.valor || f.desde || f.hasta); // Sin filas vacías
+    .filter((f) => f.producto || f.tipo || f.valor || f.desde || f.hasta); // Sin filas vacías
 }
 
 const insigniaAccion = {
@@ -110,12 +110,12 @@ export function CargaTarifas({ onCerrar, onCargado }: { onCerrar: () => void; on
           <a href="/plantilla-tarifas.xlsx" download className="font-medium text-marca-600 underline">
             plantilla de Excel
           </a>{" "}
-          y llénala: Manilla, Tipo, Valor, Desde y Hasta (una tarifa por fila).
+          y llénala: Producto, Tipo, Valor, Desde y Hasta (una tarifa por fila).
         </li>
-        <li>Los nombres de manilla y tipo deben ser iguales a los del sistema (las tildes no importan).</li>
+        <li>Los nombres de producto y tipo deben ser iguales a los del sistema (las tildes no importan).</li>
         <li>
-          Si la fila es de una manilla y tipo que ya tiene tarifa con fechas que se cruzan, actualiza la
-          predeterminada de la manilla o la que tenga exactamente las mismas fechas.
+          Si la fila es de un producto y tipo que ya tiene tarifa con fechas que se cruzan, actualiza la
+          predeterminada del producto o la que tenga exactamente las mismas fechas.
         </li>
       </ol>
 
@@ -146,7 +146,7 @@ export function CargaTarifas({ onCerrar, onCargado }: { onCerrar: () => void; on
               <thead className="sticky top-0 bg-crema-50 uppercase text-slate-500">
                 <tr>
                   <th className="px-3 py-2 font-medium">Fila</th>
-                  <th className="px-3 py-2 font-medium">Manilla</th>
+                  <th className="px-3 py-2 font-medium">Producto</th>
                   <th className="px-3 py-2 font-medium">Tipo</th>
                   <th className="px-3 py-2 text-right font-medium">Valor</th>
                   <th className="px-3 py-2 font-medium">Desde</th>
@@ -158,7 +158,7 @@ export function CargaTarifas({ onCerrar, onCargado }: { onCerrar: () => void; on
                 {revision.filas.map((f) => (
                   <tr key={f.fila} className={f.accion === "error" ? "bg-red-50/60" : ""}>
                     <td className="px-3 py-2 tabular-nums text-slate-500">{f.fila}</td>
-                    <td className="px-3 py-2 font-medium">{f.manilla}</td>
+                    <td className="px-3 py-2 font-medium">{f.producto}</td>
                     <td className="px-3 py-2">{f.tipo}</td>
                     <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums">
                       {f.valor === null ? "—" : formatearPesos(f.valor)}

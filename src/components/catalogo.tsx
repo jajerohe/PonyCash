@@ -1,6 +1,6 @@
 "use client";
 
-// Listado de nombre + descripción (manillas, tipos de tarifa…): buscador, tabla
+// Listado de nombre + descripción (productos, tipos de tarifa…): buscador, tabla
 // Nombre/Descripción/Estado y botones para crear, editar, activar y eliminar.
 import { useState } from "react";
 import {
@@ -27,11 +27,11 @@ export type Elemento = {
 };
 
 export type TextosCatalogo = {
-  titulo: string; // "Listado de Manillas"
-  buscar: string; // "Buscar manilla"
-  singular: string; // "manilla"
-  plural: string; // "manillas"
-  nuevo: string; // "Nueva manilla"
+  titulo: string; // "Listado de Productos"
+  buscar: string; // "Buscar producto"
+  singular: string; // "producto"
+  plural: string; // "productos"
+  nuevo: string; // "Nuevo producto"
   alEliminar?: string; // Aviso extra al confirmar la eliminación
 };
 
