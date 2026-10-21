@@ -25,3 +25,9 @@ export function mensajeDeError(error: unknown): string {
 
 // Resultado que devuelven las acciones de los formularios.
 export type Estado = { ok: boolean; mensaje: string } | null;
+
+// Código de PostgreSQL cuando se repite un valor que debe ser único.
+export function esDuplicado(error: unknown) {
+  const e = error as { code?: string; cause?: { code?: string } };
+  return (e?.code ?? e?.cause?.code) === "23505";
+}

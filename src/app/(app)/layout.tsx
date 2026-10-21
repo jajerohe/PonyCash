@@ -10,7 +10,13 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   const esAdmin = user.role === "admin";
   const secciones: SeccionMenu[] = [
     { opciones: [{ href: "/", texto: "Inicio" }] },
-    { titulo: "Operaciones", opciones: [{ href: "/manillas", texto: "Manillas" }] },
+    {
+      titulo: "Operaciones",
+      opciones: [
+        { href: "/manillas", texto: "Manillas" },
+        { href: "/tipos-tarifa", texto: "Tipos de Tarifas" },
+      ],
+    },
     {
       titulo: "Administración",
       opciones: [

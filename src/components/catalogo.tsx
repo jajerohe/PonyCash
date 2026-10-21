@@ -3,9 +3,31 @@
 import { startTransition, useActionState, useEffect, useState, type ReactNode } from "react";
 import { Boton, Campo, Insignia } from "@/components/ui";
 import type { Estado } from "@/lib/errores";
-import { cambiarEstadoManilla, eliminarManilla, guardarManilla } from "./actions";
+// Listado genérico (manillas, tipos de tarifa…): buscador, tabla
+// Nombre/Descripción/Estado y botones para crear, editar, activar y eliminar.
 
-type Manilla = { id: number; nombre: string; descripcion: string | null; activa: boolean };
+export type Elemento = {
+  id: number;
+  nombre: string;
+  descripcion: string | null;
+  activa: boolean;
+  // Los protegidos vienen con el sistema: no se editan, desactivan ni eliminan.
+  protegido?: boolean;
+};
+
+export type TextosCatalogo = {
+  titulo: string; // "Listado de Manillas"
+  buscar: string; // "Buscar manilla"
+  singular: string; // "manilla"
+  plural: string; // "manillas"
+  nuevo: string; // "Nueva manilla"
+};
+
+type Acciones = {
+  guardar: (estado: Estado, datos: FormData) => Promise<Estado>;
+  cambiarEstado: (id: number) => Promise<Estado>;
+  eliminar: (id: number) => Promise<Estado>;
+};
 
 // Quita tildes y mayúsculas para que "nino" encuentre "Niño".
 function normalizar(texto: string) {
@@ -42,21 +64,25 @@ function BotonAccion({
 
 const icono = "h-6 w-6";
 
-// Ventana para crear o editar una manilla.
-function VentanaManilla({
-  manilla,
+// Ventana para crear o editar un elemento.
+function Ventana({
+  elemento,
+  textos,
+  guardar,
   onCerrar,
-  onGuardada,
+  onGuardado,
 }: {
-  manilla: Manilla | null;
+  elemento: Elemento | null;
+  textos: TextosCatalogo;
+  guardar: Acciones["guardar"];
   onCerrar: () => void;
-  onGuardada: (estado: Estado) => void;
+  onGuardado: (estado: Estado) => void;
 }) {
-  const [estado, enviar, pendiente] = useActionState(guardarManilla, null);
+  const [estado, enviar, pendiente] = useActionState(guardar, null);
 
   useEffect(() => {
-    if (estado?.ok) onGuardada(estado);
-  }, [estado, onGuardada]);
+    if (estado?.ok) onGuardado(estado);
+  }, [estado, onGuardado]);
 
   return (
     <div
@@ -71,7 +97,7 @@ function VentanaManilla({
         onClick={(e) => e.stopPropagation()}
       >
         <h2 id="titulo-ventana" className="mb-4 text-lg font-semibold">
-          {manilla ? "Editar manilla" : "Nueva manilla"}
+          {elemento ? `Editar ${textos.singular}` : textos.nuevo}
         </h2>
         <form
           className="space-y-4"
@@ -81,14 +107,14 @@ function VentanaManilla({
             startTransition(() => enviar(datos));
           }}
         >
-          <input type="hidden" name="id" value={manilla?.id ?? 0} />
-          <Campo etiqueta="Nombre" name="nombre" defaultValue={manilla?.nombre} required autoFocus />
+          <input type="hidden" name="id" value={elemento?.id ?? 0} />
+          <Campo etiqueta="Nombre" name="nombre" defaultValue={elemento?.nombre} required autoFocus />
           <label className="block">
             <span className="mb-1 block text-sm font-medium text-slate-700">Descripción</span>
             <textarea
               name="descripcion"
               rows={3}
-              defaultValue={manilla?.descripcion ?? ""}
+              defaultValue={elemento?.descripcion ?? ""}
               className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-marca-500 focus:ring-2 focus:ring-marca-200"
             />
           </label>
@@ -100,7 +126,7 @@ function VentanaManilla({
               Cancelar
             </Boton>
             <Boton type="submit" disabled={pendiente}>
-              {pendiente ? "Guardando…" : manilla ? "Guardar cambios" : "Crear manilla"}
+              {pendiente ? "Guardando…" : elemento ? "Guardar cambios" : `Crear ${textos.singular}`}
             </Boton>
           </div>
         </form>
@@ -109,7 +135,17 @@ function VentanaManilla({
   );
 }
 
-export function ListadoManillas({ manillas, puedeEditar }: { manillas: Manilla[]; puedeEditar: boolean }) {
+export function Catalogo({
+  elementos,
+  puedeEditar,
+  textos,
+  acciones,
+}: {
+  elementos: Elemento[];
+  puedeEditar: boolean;
+  textos: TextosCatalogo;
+  acciones: Acciones;
+}) {
   const [busqueda, setBusqueda] = useState("");
   const [seleccionadaId, setSeleccionadaId] = useState<number | null>(null);
   const [ventana, setVentana] = useState<"crear" | "editar" | null>(null);
@@ -117,8 +153,10 @@ export function ListadoManillas({ manillas, puedeEditar }: { manillas: Manilla[]
   const [ocupado, setOcupado] = useState(false);
 
   const filtro = normalizar(busqueda.trim());
-  const visibles = manillas.filter((m) => normalizar(`${m.nombre} ${m.descripcion ?? ""}`).includes(filtro));
-  const seleccionada = manillas.find((m) => m.id === seleccionadaId) ?? null;
+  const visibles = elementos.filter((m) => normalizar(`${m.nombre} ${m.descripcion ?? ""}`).includes(filtro));
+  const seleccionada = elementos.find((m) => m.id === seleccionadaId) ?? null;
+  // Editar, activar y eliminar solo aplican a uno seleccionado que no esté protegido.
+  const sinAccion = !seleccionada || seleccionada.protegido || ocupado;
 
   function ejecutar(accion: () => Promise<Estado>, despues?: () => void) {
     setOcupado(true);
@@ -134,28 +172,28 @@ export function ListadoManillas({ manillas, puedeEditar }: { manillas: Manilla[]
     <div className="max-w-5xl space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-3">
-          <h1 className="text-2xl font-bold">Listado de Manillas</h1>
-          <label className="flex items-center gap-2 text-sm font-medium text-slate-700" htmlFor="buscar-manilla">
+          <h1 className="text-2xl font-bold">{textos.titulo}</h1>
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700" htmlFor="buscar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} className="h-6 w-6" aria-hidden="true">
               <circle cx="10.5" cy="10.5" r="6.5" />
               <path strokeLinecap="round" d="m15.5 15.5 5 5" />
             </svg>
-            Buscar manilla
+            {textos.buscar}
           </label>
         </div>
 
         {puedeEditar && (
           <div className="flex gap-3 rounded-xl bg-crema-100/70 px-4 py-3">
-            <BotonAccion titulo="Crear manilla" color="bg-gradient-to-b from-lime-500 to-lime-700" onClick={() => setVentana("crear")}>
+            <BotonAccion titulo={`Crear ${textos.singular}`} color="bg-gradient-to-b from-lime-500 to-lime-700" onClick={() => setVentana("crear")}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} className={icono} aria-hidden="true">
                 <circle cx="12" cy="12" r="8.5" />
                 <path strokeLinecap="round" d="M12 8v8M8 12h8" />
               </svg>
             </BotonAccion>
             <BotonAccion
-              titulo="Editar manilla"
+              titulo={`Editar ${textos.singular}`}
               color="bg-sky-500"
-              deshabilitado={!seleccionada || ocupado}
+              deshabilitado={sinAccion}
               onClick={() => setVentana("editar")}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className={icono} aria-hidden="true">
@@ -163,10 +201,10 @@ export function ListadoManillas({ manillas, puedeEditar }: { manillas: Manilla[]
               </svg>
             </BotonAccion>
             <BotonAccion
-              titulo={seleccionada?.activa === false ? "Activar manilla" : "Desactivar manilla"}
+              titulo={`${seleccionada?.activa === false ? "Activar" : "Desactivar"} ${textos.singular}`}
               color="bg-amber-400"
-              deshabilitado={!seleccionada || ocupado}
-              onClick={() => seleccionada && ejecutar(() => cambiarEstadoManilla(seleccionada.id))}
+              deshabilitado={sinAccion}
+              onClick={() => seleccionada && ejecutar(() => acciones.cambiarEstado(seleccionada.id))}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className={icono} aria-hidden="true">
                 <rect x="3" y="7" width="18" height="10" rx="5" />
@@ -174,13 +212,13 @@ export function ListadoManillas({ manillas, puedeEditar }: { manillas: Manilla[]
               </svg>
             </BotonAccion>
             <BotonAccion
-              titulo="Eliminar manilla"
+              titulo={`Eliminar ${textos.singular}`}
               color="bg-red-500"
-              deshabilitado={!seleccionada || ocupado}
+              deshabilitado={sinAccion}
               onClick={() => {
                 if (!seleccionada) return;
-                if (!window.confirm(`¿Eliminar la manilla "${seleccionada.nombre}"? No se puede deshacer.`)) return;
-                ejecutar(() => eliminarManilla(seleccionada.id), () => setSeleccionadaId(null));
+                if (!window.confirm(`¿Eliminar ${textos.singular} "${seleccionada.nombre}"? No se puede deshacer.`)) return;
+                ejecutar(() => acciones.eliminar(seleccionada.id), () => setSeleccionadaId(null));
               }}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className={icono} aria-hidden="true">
@@ -192,7 +230,7 @@ export function ListadoManillas({ manillas, puedeEditar }: { manillas: Manilla[]
       </div>
 
       <input
-        id="buscar-manilla"
+        id="buscar"
         type="search"
         value={busqueda}
         onChange={(e) => setBusqueda(e.target.value)}
@@ -207,8 +245,11 @@ export function ListadoManillas({ manillas, puedeEditar }: { manillas: Manilla[]
       )}
 
       <section className="overflow-x-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        {puedeEditar && manillas.length > 0 && (
-          <p className="mb-3 text-xs text-slate-500">Haz clic en una manilla para seleccionarla; doble clic para editarla.</p>
+        {puedeEditar && elementos.length > 0 && (
+          <p className="mb-3 text-xs text-slate-500">
+            Haz clic en una fila para seleccionarla; doble clic para editarla.
+            {seleccionada?.protegido && " Este registro viene con el sistema y no se puede modificar."}
+          </p>
         )}
         <table className="w-full text-left text-sm">
           <thead className="border-y border-slate-300 bg-crema-50 text-xs uppercase text-slate-500">
@@ -229,11 +270,18 @@ export function ListadoManillas({ manillas, puedeEditar }: { manillas: Manilla[]
                   onDoubleClick={() => {
                     if (!puedeEditar) return;
                     setSeleccionadaId(m.id);
-                    setVentana("editar");
+                    if (!m.protegido) setVentana("editar");
                   }}
-                  className={`${puedeEditar ? "cursor-pointer" : ""} ${activa ? "bg-marca-100" : "hover:bg-crema-50"}`}
+                  className={`${puedeEditar ? "cursor-pointer select-none" : ""} ${activa ? "bg-marca-100" : "hover:bg-crema-50"}`}
                 >
-                  <td className="px-4 py-3 font-semibold">{m.nombre}</td>
+                  <td className="px-4 py-3 font-semibold">
+                    {m.nombre}
+                    {m.protegido && (
+                      <span className="ml-2 align-middle">
+                        <Insignia color="marca">Predeterminada</Insignia>
+                      </span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-slate-500">{m.descripcion}</td>
                   <td className="px-4 py-3">
                     {m.activa ? <Insignia color="verde">Activo</Insignia> : <Insignia color="gris">Inactivo</Insignia>}
@@ -245,17 +293,19 @@ export function ListadoManillas({ manillas, puedeEditar }: { manillas: Manilla[]
         </table>
         {visibles.length === 0 && (
           <p className="py-8 text-center text-sm text-slate-500">
-            {manillas.length === 0 ? "Todavía no hay manillas." : "Ninguna manilla coincide con la búsqueda."}
+            {elementos.length === 0 ? `Todavía no hay ${textos.plural}.` : "Ningún registro coincide con la búsqueda."}
           </p>
         )}
       </section>
 
       {ventana && (
-        <VentanaManilla
+        <Ventana
           key={ventana === "editar" ? `editar-${seleccionada?.id}` : "crear"}
-          manilla={ventana === "editar" ? seleccionada : null}
+          elemento={ventana === "editar" ? seleccionada : null}
+          textos={textos}
+          guardar={acciones.guardar}
           onCerrar={() => setVentana(null)}
-          onGuardada={(estado) => {
+          onGuardado={(estado) => {
             setAviso(estado);
             setVentana(null);
           }}
