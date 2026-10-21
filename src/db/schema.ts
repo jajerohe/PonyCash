@@ -159,3 +159,23 @@ export const tarifa = pgTable(
     uniqueIndex("tarifa_predeterminada_unica").on(table.manillaId).where(sql`${table.predeterminada}`),
   ],
 );
+
+// ---------- Puntos de venta ----------
+
+// Taquillas o lugares del parque donde se venden las manillas.
+export const puntoVenta = pgTable(
+  "punto_venta",
+  {
+    id: serial("id").primaryKey(),
+    nombre: text("nombre").notNull(),
+    descripcion: text("descripcion"),
+    activa: boolean("activa").notNull().default(true),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  // El nombre no se repite aunque cambien mayúsculas.
+  (table) => [uniqueIndex("punto_venta_nombre_unico").on(sql`lower(${table.nombre})`)],
+);
