@@ -62,7 +62,7 @@ export function Planilla({
       }}
     >
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="overflow-auto border-t border-slate-300">
+        <div className="max-h-[calc(100dvh-17rem)] min-h-48 overflow-auto border-t border-slate-300">
           <table className="w-full text-left text-sm">
             <thead className={claseEncabezadoFijo}>
               <tr>
@@ -102,7 +102,7 @@ export function Planilla({
                   </tr>
                 );
               })}
-              <tr className="bg-crema-50 font-bold">
+              <tr className="sticky bottom-0 bg-crema-50 font-bold shadow-[inset_0_1px_0_var(--color-slate-300)]">
                 <td className="px-4 py-2.5">TOTAL MANILLAS</td>
                 <td className="px-4 py-2.5 text-right tabular-nums">{suma((f) => f.anterior)}</td>
                 <td className="px-4 py-2.5 text-right tabular-nums text-sky-700">{suma((f) => f.recibidas)}</td>

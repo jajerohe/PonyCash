@@ -98,7 +98,7 @@ export default async function MovimientosPage({
       </div>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="overflow-auto border-t border-slate-300">
+        <div className="max-h-[calc(100dvh-14rem)] min-h-48 overflow-auto border-t border-slate-300">
           <table className="w-full text-left text-sm">
             <thead className={claseEncabezadoFijo}>
               <tr>

@@ -22,7 +22,7 @@ export function FormularioEntrega({
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <Formulario accion={accion} textoBoton="Registrar entrega">
-        <div className="overflow-auto rounded-lg border border-slate-200">
+        <div className="max-h-[calc(100dvh-22rem)] min-h-48 overflow-auto rounded-lg border border-slate-200">
           <table className="w-full text-left text-sm">
             <thead className={claseEncabezadoFijo}>
               <tr>
