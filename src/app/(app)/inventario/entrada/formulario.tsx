@@ -28,7 +28,7 @@ export function FormularioEntrada({ productos, fecha }: { productos: Producto[];
           <Campo etiqueta="Fecha" name="fecha" type="date" defaultValue={fecha} max={fecha} required />
           <Campo etiqueta="Detalle (factura, proveedor…)" name="detalle" placeholder="Ej.: Compra FV-10234" />
         </div>
-        <div className="overflow-auto rounded-lg border border-slate-200">
+        <div className="max-h-[calc(100dvh-26rem)] min-h-48 overflow-auto rounded-lg border border-slate-200">
           <table className="w-full text-left text-sm">
             <thead className={claseEncabezadoFijo}>
               <tr>
