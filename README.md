@@ -12,6 +12,11 @@ Por ahora tiene:
   - **Cargar archivo** (botón morado): carga muchas tarifas a la vez desde Excel con la plantilla `public/plantilla-tarifas.xlsx`. Muestra cada fila revisada (nueva, actualiza o error) y solo guarda si no hay errores.
 - **Puntos de Venta** (grupo Configuración): taquillas o lugares de venta, igual que Productos (nombre único, sin importar mayúsculas).
 - **Productos por Punto de Venta** (grupo Configuración): se elige un punto de venta y se marcan los productos que puede vender (los inactivos no se pueden marcar).
+- **Inventario** (grupo Inventario): todo se maneja como manillas físicas que se cuentan.
+  - **Inventario general**: existencia de cada producto, cuántas tienen los puntos de venta, cuántas quedan en bodega y su estado frente al mínimo. Los administradores registran **entradas** (compras) y **ajustes** (con motivo).
+  - **Jornada diaria**: cada punto de venta empieza con lo que le quedó en su jornada anterior, puede **recibir más manillas** durante el día (sale de la bodega, no cambia la existencia) y al final se registra el **cierre** contando lo que quedó. Vendidas = (le quedó antes + recibió) − quedaron, y se descuentan del inventario general. Lo que quedó sigue en el punto para la siguiente jornada. Un administrador puede **reabrir** el último cierre de un punto para corregirlo.
+  - **Movimientos**: historia de un producto con su existencia después de cada movimiento.
+  - **Reporte de ventas**: vendidas por producto y punto de venta entre dos fechas.
 - **Administración de usuarios** (solo administradores): crear, editar nombre y correo, cambiar rol (Administrador o Usuario), cambiar contraseña, bloquear/desbloquear y eliminar.
 
 ## Herramientas
@@ -76,6 +81,7 @@ src/
 ├── lib/
 │   ├── auth.ts                 Configuración de Better Auth
 │   ├── session.ts              getSession(), requireSession() y requireAdmin()
+│   ├── inventario.ts           Existencias, manillas en los puntos y jornadas
 │   └── errores.ts              Mensajes de error en español
 ├── components/
 │   ├── ui.tsx                  Botón, campo, tarjeta, insignia
@@ -96,6 +102,10 @@ src/
         │   └── carga.ts        Revisión y carga de tarifas desde Excel
         ├── puntos-venta/       Listado de puntos de venta
         ├── productos-punto-venta/ Qué productos vende cada punto de venta
+        ├── inventario/         Inventario general, entradas y ajustes
+        ├── jornada/            Jornada diaria: agregar manillas y cierre de cada punto
+        ├── movimientos/        Historia de un producto
+        ├── reporte-ventas/     Vendidas por producto y punto de venta
         └── usuarios/           Administración de usuarios
             ├── page.tsx        Lista
             ├── nuevo/          Crear usuario

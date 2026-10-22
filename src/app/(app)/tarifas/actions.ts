@@ -20,7 +20,7 @@ function leerValor(texto: string) {
   return valor <= 2_000_000_000 ? valor : null;
 }
 
-// Busca otra tarifa activa de la misma producto y tipo cuyas fechas se crucen.
+// Busca otra tarifa activa del mismo producto y tipo cuyas fechas se crucen.
 async function buscarCruce(datos: { id: number; productoId: number; tipoTarifaId: number; desde: string; hasta: string }) {
   const [cruce] = await getDb()
     .select({ desde: tarifa.desde, hasta: tarifa.hasta })

@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import { puntoVenta } from "@/db/schema";
-import { esDuplicado, type Estado } from "@/lib/errores";
+import { esDuplicado, estaEnUso, type Estado } from "@/lib/errores";
 import { requireAdmin } from "@/lib/session";
 
 export async function guardarPuntoVenta(_estado: Estado, datos: FormData): Promise<Estado> {
@@ -37,10 +37,14 @@ export async function cambiarEstadoPuntoVenta(id: number): Promise<Estado> {
 
 export async function eliminarPuntoVenta(id: number): Promise<Estado> {
   await requireAdmin();
-  const [borrado] = await getDb()
-    .delete(puntoVenta)
-    .where(eq(puntoVenta.id, id))
-    .returning({ nombre: puntoVenta.nombre });
+  // Si ya tiene jornadas de inventario no se puede borrar: solo desactivar.
+  let borrado;
+  try {
+    [borrado] = await getDb().delete(puntoVenta).where(eq(puntoVenta.id, id)).returning({ nombre: puntoVenta.nombre });
+  } catch (e) {
+    if (estaEnUso(e)) return { ok: false, mensaje: "El punto de venta ya tiene jornadas de inventario: desactívalo en lugar de eliminarlo." };
+    throw e;
+  }
   revalidatePath("/puntos-venta");
   return borrado
     ? { ok: true, mensaje: `Punto de venta "${borrado.nombre}" eliminado.` }
