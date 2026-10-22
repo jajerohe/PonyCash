@@ -169,6 +169,13 @@
       "when": 1792599726132,
       "tag": "0023_manillas_a_productos",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1792632525264,
+      "tag": "0024_inventario",
+      "breakpoints": true
     }
   ]
 }

@@ -81,3 +81,24 @@ export function Insignia({
     </span>
   );
 }
+
+// Recuadro con una cifra grande (resúmenes de inventario y reportes).
+export function Resumen({
+  titulo,
+  valor,
+  nota,
+  color = "text-slate-900",
+}: {
+  titulo: string;
+  valor: React.ReactNode;
+  nota?: React.ReactNode;
+  color?: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <p className="text-xs font-medium uppercase text-slate-500">{titulo}</p>
+      <p className={`mt-1 text-2xl font-bold tabular-nums ${color}`}>{valor}</p>
+      {nota && <p className="text-xs text-slate-500">{nota}</p>}
+    </div>
+  );
+}

@@ -37,3 +37,15 @@ export function vigencia(desde: string, hasta: string, dia = hoy()): Vigencia {
   if (desde > dia) return "proxima";
   return "vigente";
 }
+
+// Hora de Colombia de un momento: "6:10 p. m."
+export function formatearHora(momento: Date) {
+  return new Intl.DateTimeFormat("es-CO", { timeZone: ZONA, hour: "numeric", minute: "2-digit" }).format(momento);
+}
+
+// Suma días a una fecha "AAAA-MM-DD".
+export function sumarDias(texto: string, dias: number) {
+  const fecha = new Date(`${texto}T00:00:00Z`);
+  fecha.setUTCDate(fecha.getUTCDate() + dias);
+  return fecha.toISOString().slice(0, 10);
+}

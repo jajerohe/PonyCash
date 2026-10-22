@@ -99,6 +99,8 @@ export const producto = pgTable("producto", {
   nombre: text("nombre").notNull().unique(),
   descripcion: text("descripcion"),
   activa: boolean("activa").notNull().default(true),
+  // Existencia mínima en el inventario general; por debajo se marca "Bajo".
+  minimo: integer("minimo").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -196,5 +198,71 @@ export const puntoVentaProducto = pgTable(
   (table) => [
     primaryKey({ columns: [table.puntoVentaId, table.productoId] }),
     index("punto_venta_producto_producto_idx").on(table.productoId),
+  ],
+);
+
+// ---------- Inventario ----------
+
+// Jornada de un punto de venta en un día. Empieza con lo que le quedó en su
+// jornada anterior, recibe manillas durante el día y al cerrarse se cuenta lo
+// que quedó: vendidas = (anterior + recibidas) − final.
+export const jornada = pgTable(
+  "jornada",
+  {
+    id: serial("id").primaryKey(),
+    puntoVentaId: integer("punto_venta_id")
+      .notNull()
+      .references(() => puntoVenta.id, { onDelete: "restrict" }),
+    fecha: date("fecha", { mode: "string" }).notNull(),
+    cerrada: boolean("cerrada").notNull().default(false),
+    cerradaEn: timestamp("cerrada_en"),
+    cerradaPor: text("cerrada_por"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [uniqueIndex("jornada_punto_fecha_unica").on(table.puntoVentaId, table.fecha)],
+);
+
+// Manillas de cada producto en una jornada.
+export const jornadaProducto = pgTable(
+  "jornada_producto",
+  {
+    jornadaId: integer("jornada_id")
+      .notNull()
+      .references(() => jornada.id, { onDelete: "cascade" }),
+    productoId: integer("producto_id")
+      .notNull()
+      .references(() => producto.id, { onDelete: "restrict" }),
+    anterior: integer("anterior").notNull().default(0), // Le quedó en la jornada anterior
+    recibidas: integer("recibidas").notNull().default(0), // Se le entregaron en el día
+    final: integer("final"), // Quedaron al cierre (null mientras no se cierra)
+  },
+  (table) => [primaryKey({ columns: [table.jornadaId, table.productoId] })],
+);
+
+// Historia del inventario general. "cambio" es lo que suma o resta a la
+// existencia: las entradas suman, las ventas (al cerrar) restan, los ajustes
+// pueden hacer ambas cosas y las entregas a un punto no la cambian (cambio 0).
+export const movimiento = pgTable(
+  "movimiento",
+  {
+    id: serial("id").primaryKey(),
+    fecha: date("fecha", { mode: "string" }).notNull(),
+    tipo: text("tipo", { enum: ["entrada", "ajuste", "entrega", "venta"] }).notNull(),
+    productoId: integer("producto_id")
+      .notNull()
+      .references(() => producto.id, { onDelete: "restrict" }),
+    puntoVentaId: integer("punto_venta_id").references(() => puntoVenta.id, { onDelete: "restrict" }),
+    jornadaId: integer("jornada_id").references(() => jornada.id, { onDelete: "cascade" }),
+    cantidad: integer("cantidad").notNull(), // Manillas entregadas, recibidas o vendidas
+    cambio: integer("cambio").notNull(),
+    inicial: integer("inicial"), // En las ventas: con cuántas empezó el punto
+    quedaron: integer("quedaron"), // En las ventas: cuántas quedaron al cierre
+    detalle: text("detalle"),
+    usuario: text("usuario").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("movimiento_producto_idx").on(table.productoId, table.fecha),
+    index("movimiento_fecha_idx").on(table.fecha),
   ],
 );

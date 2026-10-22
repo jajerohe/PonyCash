@@ -5,7 +5,7 @@ import { asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import { producto, tarifa, tipoTarifa } from "@/db/schema";
-import { esDuplicado, type Estado } from "@/lib/errores";
+import { esDuplicado, estaEnUso, type Estado } from "@/lib/errores";
 import { finDeAnio, hoy } from "@/lib/fechas";
 import { requireAdmin } from "@/lib/session";
 
@@ -62,8 +62,15 @@ export async function cambiarEstadoProducto(id: number): Promise<Estado> {
 
 export async function eliminarProducto(id: number): Promise<Estado> {
   await requireAdmin();
-  // Sus tarifas se borran con ella (la base de datos lo hace en cascada).
-  const [borrada] = await getDb().delete(producto).where(eq(producto.id, id)).returning({ nombre: producto.nombre });
+  // Sus tarifas se borran con él (la base de datos lo hace en cascada). Si ya
+  // tiene movimientos de inventario no se puede borrar: solo desactivar.
+  let borrada;
+  try {
+    [borrada] = await getDb().delete(producto).where(eq(producto.id, id)).returning({ nombre: producto.nombre });
+  } catch (e) {
+    if (estaEnUso(e)) return { ok: false, mensaje: "El producto ya tiene movimientos de inventario: desactívalo en lugar de eliminarlo." };
+    throw e;
+  }
   revalidatePath("/productos");
   revalidatePath("/tarifas");
   return borrada
