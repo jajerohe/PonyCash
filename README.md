@@ -107,10 +107,9 @@ src/
         ├── movimientos/        Historia de un producto
         ├── reporte-ventas/     Vendidas por producto y punto de venta
         └── usuarios/           Administración de usuarios
-            ├── page.tsx        Lista
-            ├── nuevo/          Crear usuario
-            ├── [id]/           Editar usuario
-            └── actions.ts      Acciones (crear, editar, bloquear, eliminar…)
+            ├── page.tsx        Lee los usuarios
+            ├── listado.tsx     Lista con buscador y botones redondos (crear, editar, bloquear, eliminar)
+            └── actions.ts      Acciones (crear/editar, bloquear, eliminar)
 drizzle/                        Migraciones SQL (cambios en las tablas)
 wrangler.jsonc                  Configuración del Worker de Cloudflare
 open-next.config.ts             Configuración del adaptador OpenNext

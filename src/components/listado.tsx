@@ -1,6 +1,6 @@
 "use client";
 
-// Piezas compartidas de los listados (productos, tipos de tarifa, tarifas…):
+// Piezas compartidas de los listados (productos, tipos de tarifa, tarifas, usuarios…):
 // cabecera con buscador, barra de botones redondos, ventana con formulario
 // y el estado de la fila seleccionada.
 import { startTransition, useActionState, useEffect, useState, type ReactNode } from "react";
@@ -10,8 +10,9 @@ import type { Estado } from "@/lib/errores";
 export { normalizar } from "@/lib/texto";
 
 // Fila seleccionada, ventana abierta, aviso y acciones en curso.
-export function useListado() {
-  const [seleccionadaId, setSeleccionadaId] = useState<number | null>(null);
+// El id es un número, salvo en listados como el de usuarios, que usan texto.
+export function useListado<Id = number>() {
+  const [seleccionadaId, setSeleccionadaId] = useState<Id | null>(null);
   const [ventana, setVentana] = useState<"crear" | "editar" | null>(null);
   const [aviso, setAviso] = useState<Estado>(null);
   const [ocupado, setOcupado] = useState(false);
