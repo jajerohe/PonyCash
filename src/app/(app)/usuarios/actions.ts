@@ -4,105 +4,80 @@
 // quien la ejecuta sea administrador, porque cualquiera podría llamarlas.
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { getDb } from "@/db";
 import { session, user } from "@/db/schema";
 import { getAuth } from "@/lib/auth";
-import { mensajeDeError, type Estado } from "@/lib/errores";
+import { esDuplicado, mensajeDeError, type Estado } from "@/lib/errores";
 import { requireAdmin } from "@/lib/session";
-
-type Rol = "admin" | "user";
 
 function texto(datos: FormData, campo: string) {
   return String(datos.get(campo) ?? "").trim();
 }
 
-function rol(datos: FormData): Rol {
-  return texto(datos, "role") === "admin" ? "admin" : "user";
-}
-
-// Código de PostgreSQL cuando se repite un valor que debe ser único.
-function esDuplicado(error: unknown) {
-  const e = error as { code?: string; cause?: { code?: string } };
-  return (e?.code ?? e?.cause?.code) === "23505";
-}
-
-export async function crearUsuario(_estado: Estado, datos: FormData): Promise<Estado> {
-  await requireAdmin();
-  try {
-    // Sin "headers": la llamada la hace el servidor, después de comprobar arriba que es administrador.
-    await getAuth().api.createUser({
-      body: {
-        name: texto(datos, "name"),
-        email: texto(datos, "email"),
-        password: String(datos.get("password")),
-        role: rol(datos),
-      },
-    });
-  } catch (error) {
-    return { ok: false, mensaje: mensajeDeError(error) };
-  }
-  revalidatePath("/usuarios");
-  redirect("/usuarios");
-}
-
-export async function actualizarDatos(_estado: Estado, datos: FormData): Promise<Estado> {
-  await requireAdmin();
+// Crea un usuario (sin id) o guarda los cambios de uno existente.
+// Al editar, la contraseña es opcional: si se deja vacía no se cambia.
+export async function guardarUsuario(_estado: Estado, datos: FormData): Promise<Estado> {
+  const { user: yo } = await requireAdmin();
+  const id = texto(datos, "id");
   const name = texto(datos, "name");
   const email = texto(datos, "email").toLowerCase();
+  const password = String(datos.get("password") ?? "");
+  const role = texto(datos, "role") === "admin" ? "admin" : "user";
   if (!name || !email.includes("@")) return { ok: false, mensaje: "Revisa el nombre y el correo." };
+  if ((!id || password) && password.length < 8) {
+    return { ok: false, mensaje: "La contraseña debe tener al menos 8 caracteres." };
+  }
+
+  if (!id) {
+    try {
+      // Sin "headers": la llamada la hace el servidor, después de comprobar arriba que es administrador.
+      await getAuth().api.createUser({ body: { name, email, password, role } });
+    } catch (error) {
+      return { ok: false, mensaje: mensajeDeError(error) };
+    }
+    revalidatePath("/usuarios");
+    return { ok: true, mensaje: `Usuario "${name}" creado.` };
+  }
+
   try {
-    await getDb().update(user).set({ name, email }).where(eq(user.id, texto(datos, "userId")));
+    // Nadie puede cambiar su propio rol: así siempre queda al menos un administrador.
+    const cambios = id === yo.id ? { name, email } : { name, email, role };
+    await getDb().update(user).set(cambios).where(eq(user.id, id));
   } catch (error) {
     if (esDuplicado(error)) return { ok: false, mensaje: "Ya existe un usuario con ese correo." };
     throw error;
   }
-  revalidatePath("/usuarios");
-  return { ok: true, mensaje: "Datos guardados." };
-}
-
-export async function cambiarRol(_estado: Estado, datos: FormData): Promise<Estado> {
-  const { user: yo } = await requireAdmin();
-  const userId = texto(datos, "userId");
-  if (userId === yo.id) return { ok: false, mensaje: "No puedes cambiar tu propio rol." };
-  await getDb().update(user).set({ role: rol(datos) }).where(eq(user.id, userId));
-  revalidatePath("/usuarios");
-  return { ok: true, mensaje: "Rol actualizado." };
-}
-
-export async function cambiarContrasena(_estado: Estado, datos: FormData): Promise<Estado> {
-  await requireAdmin();
-  const nueva = String(datos.get("password"));
-  if (nueva.length < 8) {
-    return { ok: false, mensaje: "La contraseña debe tener al menos 8 caracteres." };
+  if (password) {
+    const ctx = await getAuth().$context;
+    await ctx.internalAdapter.updatePassword(id, await ctx.password.hash(password));
   }
-  const ctx = await getAuth().$context;
-  await ctx.internalAdapter.updatePassword(texto(datos, "userId"), await ctx.password.hash(nueva));
-  return { ok: true, mensaje: "Contraseña cambiada." };
+  revalidatePath("/usuarios");
+  return { ok: true, mensaje: `Usuario "${name}" guardado.` };
 }
 
-export async function cambiarBloqueo(_estado: Estado, datos: FormData): Promise<Estado> {
+// Bloquea o desbloquea. Un usuario bloqueado no puede iniciar sesión.
+export async function cambiarBloqueo(id: string): Promise<Estado> {
   const { user: yo } = await requireAdmin();
-  const userId = texto(datos, "userId");
-  if (userId === yo.id) return { ok: false, mensaje: "No puedes bloquearte a ti mismo." };
+  if (id === yo.id) return { ok: false, mensaje: "No puedes bloquearte a ti mismo." };
 
-  const bloquear = texto(datos, "bloquear") === "si";
   const db = getDb();
-  await db.update(user).set({ banned: bloquear, banReason: null, banExpires: null }).where(eq(user.id, userId));
+  const [actual] = await db.select({ banned: user.banned }).from(user).where(eq(user.id, id));
+  if (!actual) return { ok: false, mensaje: "El usuario no existe." };
+  const bloquear = !actual.banned;
+  await db.update(user).set({ banned: bloquear, banReason: null, banExpires: null }).where(eq(user.id, id));
   // Bloquear también cierra todas sus sesiones abiertas.
-  if (bloquear) await db.delete(session).where(eq(session.userId, userId));
+  if (bloquear) await db.delete(session).where(eq(session.userId, id));
 
   revalidatePath("/usuarios");
   return { ok: true, mensaje: bloquear ? "Usuario bloqueado." : "Usuario desbloqueado." };
 }
 
-export async function eliminarUsuario(_estado: Estado, datos: FormData): Promise<Estado> {
+export async function eliminarUsuario(id: string): Promise<Estado> {
   const { user: yo } = await requireAdmin();
-  const userId = texto(datos, "userId");
-  if (userId === yo.id) return { ok: false, mensaje: "No puedes eliminarte a ti mismo." };
+  if (id === yo.id) return { ok: false, mensaje: "No puedes eliminarte a ti mismo." };
 
   // Sus sesiones y su cuenta se borran solas (ON DELETE CASCADE).
-  await getDb().delete(user).where(eq(user.id, userId));
+  await getDb().delete(user).where(eq(user.id, id));
   revalidatePath("/usuarios");
-  redirect("/usuarios");
+  return { ok: true, mensaje: "Usuario eliminado." };
 }
